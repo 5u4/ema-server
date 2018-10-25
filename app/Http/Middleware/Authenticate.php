@@ -2,18 +2,53 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\AuthService;
+use Closure;
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
+use Illuminate\Contracts\Auth\Factory as Auth;
 
+/**
+ * Class Authenticate
+ * @package App\Http\Middleware
+ */
 class Authenticate extends Middleware
 {
+    /** @var AuthService $authService */
+    private $authService;
+
     /**
-     * Get the path the user should be redirected to when they are not authenticated.
+     * The authentication factory instance.
+     *
+     * @var \Illuminate\Contracts\Auth\Factory
+     */
+    protected $auth;
+
+    /**
+     * Create a new middleware instance.
+     *
+     * @param  \Illuminate\Contracts\Auth\Factory $auth
+     * @param AuthService $authService
+     */
+    public function __construct(Auth $auth, AuthService $authService)
+    {
+        $this->auth = $auth;
+        $this->authService = $authService;
+
+        parent::__construct($auth);
+    }
+
+    /**
+     * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return string
+     * @param  \Closure  $next
+     * @param  string[]  ...$guards
+     * @return mixed
      */
-    protected function redirectTo($request)
+    public function handle($request, Closure $next, ...$guards)
     {
-        return route('login');
+        $this->authService->verifyAuthToken($request->bearerToken());
+
+        return $next($request);
     }
 }

@@ -25,7 +25,6 @@ class UserService
             'username'   => $username,
             'email'      => $email,
             'password'   => bcrypt($password),
-            'last_login' => time(),
         ]);
     }
 }
