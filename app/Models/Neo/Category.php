@@ -43,7 +43,7 @@ class Category
     /**
      * @return string
      */
-    public function getDescription(): string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -51,7 +51,7 @@ class Category
     /**
      * @param string $name
      */
-    public function setDescription($name)
+    public function setName($name)
     {
         $this->name = $name;
     }

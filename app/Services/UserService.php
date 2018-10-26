@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Models\Sql\User;
+use App\Models\Neo\User as NeoUser;
+use GraphAware\Neo4j\OGM\EntityManager;
 
 /**
  * Class UserService
@@ -10,6 +12,18 @@ use App\Models\Sql\User;
  */
 class UserService
 {
+    private $entityManager;
+
+    /**
+     * UserService constructor.
+     *
+     * @param EntityManager $entityManager
+     */
+    public function __construct(EntityManager $entityManager)
+    {
+        $this->entityManager = $entityManager;
+    }
+
     /**
      * Insert an user into sql database (Without validation)
      *
@@ -26,5 +40,24 @@ class UserService
             'email'    => $email,
             'password' => bcrypt($password),
         ]);
+    }
+
+    /**
+     * Insert an user into neo database (Without validation)
+     *
+     * @param $sqlId
+     * @return NeoUser
+     * @throws \Exception
+     */
+    public function createUserInNeo($sqlId)
+    {
+        $user = new NeoUser();
+
+        $user->setSqlId($sqlId);
+
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        return $user;
     }
 }
