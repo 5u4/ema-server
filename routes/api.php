@@ -23,6 +23,6 @@ Route::group(['prefix' => 'v1'], function () {
 
     /* Transaction */
     Route::group(['prefix' => 'transaction'], function () {
-       Route::post('/', 'TransactionController@create')->middleware('auth:api');
+       Route::post('/', 'TransactionController@create')->middleware('auth');
     });
 });
