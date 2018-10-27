@@ -57,7 +57,7 @@ class AuthService
 
         $decoded = JWT::decode($token, config('auth.jwt.key'), [self::JWT_ALGORITHM]);
 
-        Auth::setUser($decoded['userId']);
+        Auth::setUser(User::find($decoded->userId));
 
         return true;
     }
