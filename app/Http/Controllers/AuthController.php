@@ -45,8 +45,6 @@ class AuthController extends Controller
     {
         $user = $this->userService->createUserInSql($request->username, $request->email, $request->password);
 
-        Auth::setUser($user);
-
         $token = $this->authService->getAuthToken();
 
         return UserResource::make($user)->additional(['token' => $token])->response();

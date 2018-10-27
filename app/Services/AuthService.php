@@ -55,7 +55,9 @@ class AuthService
             throw new UnauthorizedException();
         }
 
-        JWT::decode($token, config('auth.jwt.key'), [self::JWT_ALGORITHM]);
+        $decoded = JWT::decode($token, config('auth.jwt.key'), [self::JWT_ALGORITHM]);
+
+        Auth::setUser($decoded['userId']);
 
         return true;
     }
