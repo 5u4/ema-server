@@ -36,9 +36,9 @@ class UserService
     public function createUserInSql(string $username, string $email, string $password): User
     {
         return User::create([
-            'username' => $username,
-            'email'    => $email,
-            'password' => bcrypt($password),
+            'username'   => $username,
+            'email'      => $email,
+            'password'   => bcrypt($password),
         ]);
     }
 
