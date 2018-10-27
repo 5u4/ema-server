@@ -7,9 +7,30 @@ use GraphAware\Neo4j\OGM\Common\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * @OGM\Node(label="User")
+ * App\Models\Neo\User
+ *
+ * @OGM\Node (label="User")
  * Class User
  * @package App\Models\Neo
+ * @property int $id
+ * @property string $username
+ * @property string $email
+ * @property string|null $email_verified_at
+ * @property string $password
+ * @property string|null $last_login
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string|null $deleted_at
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Neo\User whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Neo\User whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Neo\User whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Neo\User whereEmailVerifiedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Neo\User whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Neo\User whereLastLogin($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Neo\User wherePassword($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Neo\User whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Neo\User whereUsername($value)
+ * @mixin \Eloquent
  */
 class User extends Model
 {

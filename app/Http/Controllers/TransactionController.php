@@ -22,6 +22,7 @@ class TransactionController extends Controller
     {
         // get $user id from current session
         $user = Auth::user();
+        dd(Auth::check());
         $userId = $user->id;
 
         // create a transaction and create a relationship to current user in Neo

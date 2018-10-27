@@ -7,9 +7,12 @@ use GraphAware\Neo4j\OGM\Common\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * @OGM\Node(label="TransactionCategory")
+ * App\Models\Neo\Category
+ *
+ * @OGM\Node (label="TransactionCategory")
  * Class TransactionCategory
  * @package App\Models\Neo
+ * @mixin \Eloquent
  */
 class Category extends Model
 {
