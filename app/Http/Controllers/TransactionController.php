@@ -6,6 +6,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Services\TransactionService;
 use App\Http\Resources\TransactionResource;
+use Illuminate\Support\Facades\Auth;
 
 
 class TransactionController extends Controller
@@ -19,7 +20,12 @@ class TransactionController extends Controller
 
     public function create(Request $request): JsonResponse
     {
-        $transaction = $this->transactionService->create($request->amount, $request->description);
+        // get $user id from current session
+        $user = Auth::user();
+        $userId = $user->id;
+
+        // create a transaction and create a relationship to current user in Neo
+        $transaction = $this->transactionService->create($userId, $request->amount, $request->description);
 
         return TransactionResource::make($transaction)->response();
     }

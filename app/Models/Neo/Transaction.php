@@ -38,6 +38,13 @@ class Transaction extends Model
     protected $description;
 
     /**
+     * @var HasTransaction
+     *
+     * @OGM\Relationship(relationshipEntity="HasTransaction", type="HAS_TRANSACTION", direction="INCOMING", collection="false", mappedBy="transaction")
+     */
+    protected $hasTransaction;
+
+    /**
      * Transaction constructor.
      */
     public function __construct()
@@ -99,5 +106,21 @@ class Transaction extends Model
     public function setDescription($description)
     {
         $this->description = $description;
+    }
+
+    /**
+     * @return HasTransaction
+     */
+    public function getHasTransaction(): HasTransaction
+    {
+        return $this->hasTransaction;
+    }
+
+    /**
+     * @param $hasTransaction
+     */
+    public function setHasTransaction($hasTransaction)
+    {
+        $this->hasTransaction = $hasTransaction;
     }
 }

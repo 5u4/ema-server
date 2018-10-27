@@ -26,11 +26,18 @@ class User extends Model
     protected $sqlId;
 
     /**
+     * @var Collection
+     *
+     * @OGM\Relationship(relationshipEntity="HasTransaction", type="HAS_TRANSACTION", direction="OUTGOING", collection="true", mappedBy="user")
+     */
+    protected $hasTransaction;
+
+    /**
      * User constructor.
      */
     public function __construct()
     {
-
+        $this->hasTransaction = new Collection();
     }
 
     /**
@@ -55,5 +62,21 @@ class User extends Model
     public function setSqlId($sqlId)
     {
         $this->sqlId = $sqlId;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getHasTransaction(): Collection
+    {
+        return $this->hasTransaction;
+    }
+
+    /**
+     * @param $hasTransaction
+     */
+    public function setHasTransaction($hasTransaction)
+    {
+        $this->hasTransaction = $hasTransaction;
     }
 }
