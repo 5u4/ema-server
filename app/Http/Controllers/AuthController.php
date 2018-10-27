@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Resources\UserResource;
+use App\Models\Sql\User;
 use App\Services\AuthService;
 use App\Services\UserService;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -62,7 +64,12 @@ class AuthController extends Controller
             throw new AccessDeniedHttpException("Email and password are not matched.");
         }
 
-        return UserResource::make(Auth::user())
+        /** @var User $user */
+        $user = Auth::user();
+        $user->last_login = Carbon::now();
+        $user->save();
+
+        return UserResource::make($user)
             ->additional(['token' => $this->authService->getAuthToken()])
             ->response();
     }

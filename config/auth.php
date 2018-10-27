@@ -2,6 +2,8 @@
 
 return [
 
+    'enabled' => env('AUTH_ENABLED', true),
+
     /*
     |--------------------------------------------------------------------------
     | Authentication Defaults
