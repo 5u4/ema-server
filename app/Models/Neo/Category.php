@@ -12,7 +12,6 @@ use Illuminate\Database\Eloquent\Model;
  * @OGM\Node (label="TransactionCategory")
  * Class TransactionCategory
  * @package App\Models\Neo
- * @mixin \Eloquent
  */
 class Category extends Model
 {

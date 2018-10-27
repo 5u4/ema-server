@@ -12,7 +12,6 @@ use Illuminate\Database\Eloquent\Model;
  * @OGM\Node (label="Transaction")
  * Class Transaction
  * @package App\Models\Neo
- * @mixin \Eloquent
  */
 class Transaction extends Model
 {
@@ -41,9 +40,9 @@ class Transaction extends Model
     protected $description;
 
     /**
-     * @var HasTransaction
+     * @var Collection
      *
-     * @OGM\Relationship(relationshipEntity="HasTransaction", type="HAS_TRANSACTION", direction="INCOMING", collection="false", mappedBy="transaction")
+     * @OGM\Relationship(relationshipEntity="HasTransaction", type="HAS_TRANSACTION", direction="INCOMING", collection=true, mappedBy="transaction")
      */
     protected $hasTransaction;
 
@@ -52,7 +51,7 @@ class Transaction extends Model
      */
     public function __construct()
     {
-
+        $this->hasTransaction = new Collection();
     }
 
     /**

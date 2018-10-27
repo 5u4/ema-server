@@ -30,7 +30,6 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Neo\User wherePassword($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Neo\User whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Neo\User whereUsername($value)
- * @mixin \Eloquent
  */
 class User extends Model
 {
@@ -49,7 +48,7 @@ class User extends Model
     /**
      * @var Collection
      *
-     * @OGM\Relationship(relationshipEntity="HasTransaction", type="HAS_TRANSACTION", direction="OUTGOING", collection="true", mappedBy="user")
+     * @OGM\Relationship(relationshipEntity="HasTransaction", type="HAS_TRANSACTION", direction="OUTGOING", collection=true, mappedBy="user")
      */
     protected $hasTransaction;
 

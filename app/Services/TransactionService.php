@@ -35,7 +35,7 @@ class TransactionService
 
         $query = "
             MERGE (u:User {sqlId: {userId}})
-            MERGE (t:Transaction {amount: {amount}, description: {description}})
+            CREATE (t:Transaction {amount: {amount}, description: {description}})
             CREATE (u)-[:HAS_TRANSACTION]->(t)
             RETURN t
         ";
@@ -48,8 +48,8 @@ class TransactionService
             ->setParameter('description', $description)
             ->addEntityMapping('u', User::class)
             ->addEntityMapping('t', Transaction::class)
-            ->getResult();
-
+            ->getOneResult();
+        //dd($transaction->getAmount());
         return $transaction;
 
     }
