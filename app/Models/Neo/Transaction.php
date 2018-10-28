@@ -4,14 +4,11 @@ namespace App\Models\Neo;
 
 use GraphAware\Neo4j\OGM\Annotations as OGM;
 use GraphAware\Neo4j\OGM\Common\Collection;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * App\Models\Neo\Transaction
  *
  * @OGM\Node (label="Transaction")
- * Class Transaction
- * @package App\Models\Neo
  */
 class Transaction
 {

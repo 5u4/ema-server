@@ -2,14 +2,12 @@
 
 namespace App\Models\Neo;
 
-use Illuminate\Database\Eloquent\Model;
 use GraphAware\Neo4j\OGM\Annotations as OGM;
 
 /**
  * App\Models\Neo\HasTransaction
  *
  * @OGM\RelationshipEntity (type="HAS_TRANSACTION")
- * @mixin \Eloquent
  */
 class HasTransaction
 {
