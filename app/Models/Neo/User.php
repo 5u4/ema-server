@@ -31,7 +31,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Neo\User whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Neo\User whereUsername($value)
  */
-class User extends Model
+class User
 {
     /**
      * @OGM\GraphId()

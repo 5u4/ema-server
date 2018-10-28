@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  * Class Transaction
  * @package App\Models\Neo
  */
-class Transaction extends Model
+class Transaction
 {
     /**
      * @OGM\GraphId()

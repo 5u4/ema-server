@@ -11,7 +11,7 @@ use GraphAware\Neo4j\OGM\Annotations as OGM;
  * @OGM\RelationshipEntity (type="HAS_TRANSACTION")
  * @mixin \Eloquent
  */
-class HasTransaction extends Model
+class HasTransaction
 {
     /**
      * @var int
