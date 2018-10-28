@@ -6,9 +6,9 @@ use GraphAware\Neo4j\OGM\Annotations as OGM;
 use GraphAware\Neo4j\OGM\Common\Collection;
 
 /**
- * @OGM\Node(label="TransactionCategory")
- * Class TransactionCategory
- * @package App\Models\Neo
+ * App\Models\Neo\Category
+ *
+ * @OGM\Node (label="Category")
  */
 class Category
 {

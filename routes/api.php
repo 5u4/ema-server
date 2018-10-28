@@ -20,4 +20,10 @@ Route::group(['prefix' => 'v1'], function () {
         Route::post('register', 'AuthController@register');
         Route::post('login', 'AuthController@login');
     });
+
+    /* Transaction */
+    Route::group(['prefix' => 'transaction', 'middleware' => 'auth'], function () {
+       Route::post('/', 'TransactionController@create');
+       Route::get('/', 'TransactionController@index');
+    });
 });

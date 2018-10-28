@@ -6,9 +6,9 @@ use GraphAware\Neo4j\OGM\Annotations as OGM;
 use GraphAware\Neo4j\OGM\Common\Collection;
 
 /**
- * @OGM\Node(label="User")
- * Class User
- * @package App\Models\Neo
+ * App\Models\Neo\User
+ *
+ * @OGM\Node (label="User")
  */
 class User
 {
@@ -25,11 +25,18 @@ class User
     protected $sqlId;
 
     /**
+     * @var Collection
+     *
+     * @OGM\Relationship(relationshipEntity="HasTransaction", type="HAS_TRANSACTION", direction="OUTGOING", collection=true, mappedBy="user")
+     */
+    protected $hasTransaction;
+
+    /**
      * User constructor.
      */
     public function __construct()
     {
-
+        $this->hasTransaction = new Collection();
     }
 
     /**
@@ -54,5 +61,21 @@ class User
     public function setSqlId($sqlId)
     {
         $this->sqlId = $sqlId;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getHasTransaction(): Collection
+    {
+        return $this->hasTransaction;
+    }
+
+    /**
+     * @param $hasTransaction
+     */
+    public function setHasTransaction($hasTransaction)
+    {
+        $this->hasTransaction = $hasTransaction;
     }
 }
