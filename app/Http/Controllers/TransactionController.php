@@ -18,6 +18,17 @@ class TransactionController extends Controller
         $this->transactionService = $transactionService;
     }
 
+    public function index(): JsonResponse
+    {
+        $user = Auth::user();
+        $userId = $user->id;
+
+        $transactions = $this->transactionService->getAll($userId);
+
+        return TransactionResource::collection(collect($transactions))->response();
+
+    }
+
     public function create(Request $request): JsonResponse
     {
         // get $user id from current session
@@ -28,5 +39,6 @@ class TransactionController extends Controller
         $transaction = $this->transactionService->create($userId, $request->amount, $request->description);
 
         return TransactionResource::make($transaction)->response();
+
     }
 }

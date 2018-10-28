@@ -15,24 +15,27 @@ class TransactionService
         $this->entityManager = $entityManager;
     }
 
+    public function getAll($userId)
+    {
+        $query = "
+            MATCH(u:User {sqlId: {sqlId}})-[:HAS_TRANSACTION]->(t:Transaction)
+            RETURN t
+        ";
+
+        $transactions = null;
+
+        $transactions = $this->entityManager->createQuery($query)
+            ->setParameter('sqlId', $userId)
+            ->addEntityMapping('u', User::class)
+            ->addEntityMapping('t', Transaction::class)
+            ->execute();
+
+        return $transactions;
+
+    }
+
     public function create($userId, $amount, $description)
     {
-//        $transaction = new Transaction();
-
-//        $transaction->setAmount($amount);
-//        $transaction->setDescription($description);
-//        $transaction->setTimestamp(date("Y-m-d"), time());
-//
-//        $this->entityManager->persist($transaction);
-//        $this->entityManager->flush();
-
-//        // this is for json response
-//        $transaction->amount = $transaction->getAmount();
-//        $transaction->description = $transaction->getDescription();
-//        $transaction->timestamp = $transaction->getTimestamp();
-
-        // use raw query to create Transaction node in Neo
-
         $query = "
             MERGE (u:User {sqlId: {userId}})
             CREATE (t:Transaction {amount: {amount}, description: {description}})
@@ -49,7 +52,7 @@ class TransactionService
             ->addEntityMapping('u', User::class)
             ->addEntityMapping('t', Transaction::class)
             ->getOneResult();
-        //dd($transaction->getAmount());
+
         return $transaction;
 
     }
