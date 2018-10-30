@@ -17,7 +17,8 @@ class TransactionResource extends JsonResource
         return Array(
             "id" => $this->getId(),
             "amount" => $this->getAmount(),
-            "description" => $this->getDescription()
+            "description" => $this->getDescription(),
+            "timestamp" => $this->getTimestamp()
         );
     }
 }
