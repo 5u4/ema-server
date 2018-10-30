@@ -43,12 +43,12 @@ class UserService
     }
 
     /**
-     * Insert an user into neo database (Without validation)
-     *
-     * @param $sqlId
-     * @return NeoUser
-     * @throws \Exception
-     */
+ * Insert an user into neo database (Without validation)
+ *
+ * @param $sqlId
+ * @return NeoUser
+ * @throws \Exception
+ */
     public function createUserInNeo($sqlId)
     {
         $user = new NeoUser();
@@ -60,4 +60,29 @@ class UserService
 
         return $user;
     }
+
+    /**
+     * @param $userId
+     * @return array|mixed|null
+     * @throws \Exception
+     */
+    public function getUserInfo($userId)
+    {
+        $query = "
+            MATCH(u:User {sqlId: {sqlId}})-[:HAS_TRANSACTION]->(t:Transaction)
+            RETURN t
+        ";
+
+        $user = null;
+
+        $user = $this->entityManager->createQuery($query)
+            ->setParameter('sqlId', $userId)
+            ->addEntityMapping('u', User::class)
+            ->addEntityMapping('t', Transaction::class)
+            ->execute();
+
+        return $user;
+
+    }
+
 }
