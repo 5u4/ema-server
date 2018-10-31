@@ -38,16 +38,19 @@ class TransactionService
     {
         $query = "
             MERGE (u:User {sqlId: {userId}})
-            CREATE (t:Transaction {amount: {amount}, description: {description}})
+            CREATE (t:Transaction {amount: {amount}, description: {description}, timestamp: {date}})
             CREATE (u)-[:HAS_TRANSACTION]->(t)
             RETURN t
         ";
 
         $transaction = null;
 
+        $date = Date("Y-m-d",time());
+
         $transaction = $this->entityManager->createQuery($query)
             ->setParameter('userId', $userId)
             ->setParameter('amount', $amount)
+            ->setParameter('date', $date)
             ->setParameter('description', $description)
             ->addEntityMapping('u', User::class)
             ->addEntityMapping('t', Transaction::class)

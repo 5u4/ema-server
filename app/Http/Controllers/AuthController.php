@@ -11,6 +11,7 @@ use App\Services\UserService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
@@ -43,7 +44,15 @@ class AuthController extends Controller
      */
     public function register(RegisterRequest $request): JsonResponse
     {
-        $user = $this->userService->createUserInSql($request->username, $request->email, $request->password);
+        $user = DB::transaction(function () use ($request) {
+            $user = $this->userService->createUserInSql($request->username, $request->email, $request->password);
+
+            $this->userService->createUserInNeo($user->id);
+
+            Auth::setUser($user);
+
+            return $user;
+        });
 
         $token = $this->authService->getAuthToken();
 
