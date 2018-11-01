@@ -28,11 +28,7 @@ class DiningController extends Controller
     public function index(String $input): JsonResponse
     {
         $restaurantList = $this->diningService->getRestaurantList($input);
-        //dd($restaurantList);
-       return DiningResource::collection(collect($restaurantList))->response();
-
-           //->header("Access-Control-Allow-Origin","*");
-
+        return DiningResource::collection(collect($restaurantList))->response();
     }
 
 }
