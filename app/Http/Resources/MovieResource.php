@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class TransactionResource extends JsonResource
+class MovieResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,10 +15,8 @@ class TransactionResource extends JsonResource
     public function toArray($request)
     {
         return Array(
-            "id" => $this->getId(),
-            "amount" => $this->getAmount(),
-            "description" => $this->getDescription(),
-            "timestamp" => $this->getTimestamp()
+            "id" => $this->getMovieId(),
+            "name" => $this->getMovieName(),
         );
     }
 }
