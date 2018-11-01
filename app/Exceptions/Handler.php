@@ -57,7 +57,7 @@ class Handler extends ExceptionHandler
         $exception = $this->prepareException($exception);
 
         if ($exception instanceof ValidationException) {
-            $exception = new BadRequestHttpException($exception->getMessage(), $exception);
+            $exception = new BadRequestHttpException(json_encode($exception->errors()), $exception);
         } elseif ($exception instanceof ExpiredException) {
             $exception = new UnauthorizedHttpException('', 'Token expired.');
         } elseif ($exception instanceof UnauthorizedException) {
