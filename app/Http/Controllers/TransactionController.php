@@ -42,7 +42,7 @@ class TransactionController extends Controller
 
     }
 
-    public function getTransactionById(int $id)
+    public function show(int $id)
     {
         $transaction = $this->transactionService->getTransactionById($id);
 

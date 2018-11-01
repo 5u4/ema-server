@@ -63,12 +63,10 @@ class TransactionService
     public function getTransactionById(int $id)
     {
         $query = "
-            MATCH(t)
+            MATCH(t:Transaction)
             WHERE ID(t) = {id}
             RETURN t
         ";
-
-        $transaction = null;
 
         $transaction = $this->entityManager->createQuery($query)
             ->setParameter('id', $id)
