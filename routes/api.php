@@ -33,4 +33,14 @@ Route::group(['prefix' => 'v1'], function () {
         Route::post('/', 'MovieCOntroller@create');
         Route::get('/', 'MovieController@name');
     });
+
+    /* User*/
+    Route::group(['prefix' => 'user', 'middleware' => 'auth'], function () {
+        Route::get('/', 'UserController@index');
+    });
+
+    /* Dining*/
+    Route::group(['prefix' => 'dining', 'middleware' => 'auth'], function () {
+        Route::get('/restaurant_search/{input_text}', 'DiningController@index');
+    });
 });
