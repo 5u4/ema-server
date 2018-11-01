@@ -25,5 +25,6 @@ Route::group(['prefix' => 'v1'], function () {
     Route::group(['prefix' => 'transaction', 'middleware' => 'auth'], function () {
        Route::post('/', 'TransactionController@create');
        Route::get('/', 'TransactionController@index');
+       Route::get('/{id}', 'TransactionController@show');
     });
 });

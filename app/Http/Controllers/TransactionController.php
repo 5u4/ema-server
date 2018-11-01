@@ -41,4 +41,12 @@ class TransactionController extends Controller
         return TransactionResource::make($transaction)->response();
 
     }
+
+    public function show(int $id)
+    {
+        $transaction = $this->transactionService->getTransactionById($id);
+
+        return TransactionResource::make($transaction)->response();
+
+    }
 }

@@ -59,4 +59,21 @@ class TransactionService
         return $transaction;
 
     }
+
+    public function getTransactionById(int $id)
+    {
+        $query = "
+            MATCH(t:Transaction)
+            WHERE ID(t) = {id}
+            RETURN t
+        ";
+
+        $transaction = $this->entityManager->createQuery($query)
+            ->setParameter('id', $id)
+            ->addEntityMapping('t', Transaction::class)
+            ->getOneResult();
+
+        return $transaction;
+
+    }
 }
