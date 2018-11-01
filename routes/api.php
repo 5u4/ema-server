@@ -28,7 +28,8 @@ Route::group(['prefix' => 'v1'], function () {
     });
 
     /* Movie */
-    Route::group(['prefix' => 'movie'], function () {
-        Route::get('showing', 'MovieManagementController@showing');
+    Route::group(['prefix' => 'movie', 'middleware' => 'auth'], function () {
+        Route::post('/', 'MovieCOntroller@create');
+        Route::get('/', 'MovieController@name');
     });
 });
