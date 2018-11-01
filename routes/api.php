@@ -28,6 +28,12 @@ Route::group(['prefix' => 'v1'], function () {
        Route::get('/{id}', 'TransactionController@show');
     });
 
+    /* Movie */
+    Route::group(['prefix' => 'movie', 'middleware' => 'auth'], function () {
+        Route::post('/', 'MovieCOntroller@create');
+        Route::get('/', 'MovieController@name');
+    });
+
     /* User*/
     Route::group(['prefix' => 'user', 'middleware' => 'auth'], function () {
         Route::get('/', 'UserController@index');
