@@ -36,9 +36,8 @@ class DiningService
             $apiRequest = $client->request('GET', $url, $requestContent);
 
             $response = json_decode($apiRequest->getBody()->getContents(), true);
-            $response=$response["businesses"];
 
-           return $response;
+            return $response["businesses"];
 
         } catch (RequestException $re) {
             // For handling exception.
