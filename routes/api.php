@@ -26,10 +26,4 @@ Route::group(['prefix' => 'v1'], function () {
        Route::post('/', 'TransactionController@create');
        Route::get('/', 'TransactionController@index');
     });
-
-    /* Movie */
-    Route::group(['prefix' => 'movie', 'middleware' => 'auth'], function () {
-        Route::post('/', 'MovieCOntroller@create');
-        Route::get('/', 'MovieController@name');
-    });
 });
