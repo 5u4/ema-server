@@ -4,7 +4,7 @@ namespace App\Services;
 use GuzzleHttp\Client as GuzzleHttpClient;
 use GuzzleHttp\Exception\RequestException;
 use GraphAware\Neo4j\OGM\EntityManager;
-
+use PhpParser\Error;
 
 
 class DiningService
@@ -16,6 +16,11 @@ class DiningService
         $this->entityManager = $entityManager;
     }
 
+    /**
+     * @param String $input
+     * @return mixed
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
     public function getRestaurantList(String $input)
     {
         $url = 'https://api.yelp.com/v3/businesses/search?term=restaurants&location='.$input.'&limit=50';
@@ -37,30 +42,10 @@ class DiningService
 
         } catch (RequestException $re) {
             // For handling exception.
+            $response = $re->getResponse();
+            return $response;
         }
 
     }
 
-    public function create($userId, $amount, $description)
-    {
-        $query = "
-            MERGE (u:User {sqlId: {userId}})
-            CREATE (t:Transaction {amount: {amount}, description: {description}})
-            CREATE (u)-[:HAS_TRANSACTION]->(t)
-            RETURN t
-        ";
-
-        $transaction = null;
-
-        $transaction = $this->entityManager->createQuery($query)
-            ->setParameter('userId', $userId)
-            ->setParameter('amount', $amount)
-            ->setParameter('description', $description)
-            ->addEntityMapping('u', User::class)
-            ->addEntityMapping('t', Transaction::class)
-            ->getOneResult();
-
-        return $transaction;
-
-    }
 }
