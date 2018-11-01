@@ -17,16 +17,20 @@ class UserController extends Controller
     {
         $this->userService = $userService;
     }
-
+    
+    public function show(): JsonResponse
+    {
+        return UserResource::make(Auth::user())->response();
+    }
+    
     public function index(): JsonResponse
     {
-        $user = Auth::user();
-        $userId = $user->id;
+        // TODO: Add permission that only admin can view all users
 
-        $user = $this->userService->getUserInfo($userId);
-
-        return UserResource::collection(collect($user))->response();
-
+        return UserResource::collection(collect(User::all()))->response();
     }
+
+
+  
 
 }
