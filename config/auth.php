@@ -2,6 +2,8 @@
 
 return [
 
+    'enabled' => env('AUTH_ENABLED', true),
+
     /*
     |--------------------------------------------------------------------------
     | Authentication Defaults
@@ -67,7 +69,7 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => App\Models\User::class,
+            'model' => App\Models\Sql\User::class,
         ],
 
         // 'users' => [
@@ -97,6 +99,13 @@ return [
             'table' => 'password_resets',
             'expire' => 60,
         ],
+    ],
+
+    'jwt' => [
+        'key' => env('JWT_KET'),
+        'iss' => env('JWT_ISS', 'cmpt.470.bigtearice'),
+        'aud' => env('JWT_AUD', 'cmpt.470.bigtearice'),
+        'ttl' => env('JWT_TTL', 3600),
     ],
 
 ];

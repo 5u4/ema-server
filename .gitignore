@@ -13,3 +13,6 @@ yarn-error.log
 .env
 .phpunit.result.cache
 composer.lock
+_ide_helper.php
+_ide_helper_models.php
+.phpstorm.meta.php

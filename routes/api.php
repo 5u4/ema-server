@@ -13,6 +13,28 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+/* Version 1 */
+Route::group(['prefix' => 'v1'], function () {
+    /* Auth */
+    Route::group(['prefix' => 'auth'], function () {
+        Route::post('register', 'AuthController@register');
+        Route::post('login', 'AuthController@login');
+    });
+
+    /* Transaction */
+    Route::group(['prefix' => 'transaction', 'middleware' => 'auth'], function () {
+       Route::post('/', 'TransactionController@create');
+       Route::get('/', 'TransactionController@index');
+       Route::get('/{id}', 'TransactionController@show');
+    });
+
+    /* User */
+    Route::group(['prefix' => 'user', 'middleware' => 'auth'], function () {
+        Route::get('/', 'UserController@index');
+    });
+
+    /* Dining */
+    Route::group(['prefix' => 'dining', 'middleware' => 'auth'], function () {
+        Route::get('/restaurant_search/{input_text}', 'DiningController@index');
+    });
 });
