@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Services\TransactionService;
 use App\Http\Resources\TransactionResource;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\Expense\CreateTransactionRequest;
 
 
 class TransactionController extends Controller
@@ -29,7 +30,7 @@ class TransactionController extends Controller
 
     }
 
-    public function create(Request $request): JsonResponse
+    public function create(CreateTransactionRequest $request): JsonResponse
     {
         // get $user id from current session
         $user = Auth::user();

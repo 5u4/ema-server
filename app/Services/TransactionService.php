@@ -43,7 +43,8 @@ class TransactionService
             RETURN t
         ";
 
-        $transaction = null;
+        // cast transaction amount to float value
+        $amount = floatval($amount);
 
         $date = Date("Y-m-d",time());
 
