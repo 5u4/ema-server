@@ -50,4 +50,12 @@ class TransactionController extends Controller
         return TransactionResource::make($transaction)->response();
 
     }
+
+    public function delete(int $id)
+    {
+        $transaction = $this->transactionService->deleteTransactionById($id);
+
+        return TransactionResource::make($transaction)->response();
+
+    }
 }

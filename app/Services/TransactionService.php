@@ -77,4 +77,26 @@ class TransactionService
         return $transaction;
 
     }
+
+    public function deleteTransactionById(int $id)
+    {
+        $query = "
+            MATCH(t:Transaction)-[r:HAS_TRANSACTION]-(u:User)
+            WHERE ID(t) = {id}
+            DELETE r
+            DELETE t
+        ";
+
+        // Get the node first
+        $transaction = $this->getTransactionById($id);
+
+        // Then delete the node
+        $this->entityManager->createQuery($query)
+            ->setParameter('id', $id)
+            ->addEntityMapping('t', Transaction::class)
+            ->execute();
+
+        return $transaction;
+
+    }
 }
