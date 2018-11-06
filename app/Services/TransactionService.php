@@ -43,7 +43,8 @@ class TransactionService
             RETURN t
         ";
 
-        $transaction = null;
+        // cast transaction amount to float value
+        $amount = floatval($amount);
 
         $date = Date("Y-m-d",time());
 
@@ -72,6 +73,28 @@ class TransactionService
             ->setParameter('id', $id)
             ->addEntityMapping('t', Transaction::class)
             ->getOneResult();
+
+        return $transaction;
+
+    }
+
+    public function deleteTransactionById(int $id)
+    {
+        $query = "
+            MATCH(t:Transaction)-[r:HAS_TRANSACTION]-(u:User)
+            WHERE ID(t) = {id}
+            DELETE r
+            DELETE t
+        ";
+
+        // Get the node first
+        $transaction = $this->getTransactionById($id);
+
+        // Then delete the node
+        $this->entityManager->createQuery($query)
+            ->setParameter('id', $id)
+            ->addEntityMapping('t', Transaction::class)
+            ->execute();
 
         return $transaction;
 

@@ -26,6 +26,7 @@ Route::group(['prefix' => 'v1'], function () {
        Route::post('/', 'TransactionController@create');
        Route::get('/', 'TransactionController@index');
        Route::get('/{id}', 'TransactionController@show');
+       Route::delete('/{id}', 'TransactionController@delete');
     });
 
     /* User */
