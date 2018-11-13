@@ -66,4 +66,7 @@ return [
 
     ],
 
+    /* User avatar max size in bytes */
+    'max_avatar_size' => env('MAX_AVATAR_SIZE', 512000),
+
 ];

@@ -34,6 +34,12 @@ Route::group(['prefix' => 'v1'], function () {
         Route::get('/', 'UserController@index');
     });
 
+    /* Avatar */
+    Route::group(['prefix' => 'avatars'], function () {
+        Route::get('/{user}', 'AvatarController@show');
+        Route::post('/', 'AvatarController@store')->middleware('auth');
+    });
+
     /* Dining */
     Route::group(['prefix' => 'dining', 'middleware' => 'auth'], function () {
         Route::get('/restaurant_search/{input_text}', 'DiningController@index');
