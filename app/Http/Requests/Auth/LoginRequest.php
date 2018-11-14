@@ -40,7 +40,7 @@ class LoginRequest extends FormRequest
             /* Email */
             'email.required'     => 'The :attribute field is required',
             'email.email'        => 'The :attribute field should be an valid email',
-            'exists'             => 'The :attribute field is not been registered yet',
+            'email.exists'       => 'The :attribute field is not been registered yet',
 
             /* Password */
             'password.required'  => 'The :attribute field is required',

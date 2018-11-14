@@ -52,7 +52,7 @@ class RegisterRequest extends FormRequest
             /* Email */
             'email.required'     => 'The :attribute field is required',
             'email.email'        => 'The :attribute field should be an valid email',
-            'unique'             => 'The :attribute field is already been taken',
+            'email.unique'       => 'The :attribute field is already been taken',
 
             /* Password */
             'password.required'  => 'The :attribute field is required',
