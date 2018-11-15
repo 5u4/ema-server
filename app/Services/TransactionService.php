@@ -46,7 +46,7 @@ class TransactionService
         // cast transaction amount to float value
         $amount = floatval($amount);
 
-        $date = Date("Y-m-d",time());
+        $date = Date("Y-m-d", time());
 
         $transaction = $this->entityManager->createQuery($query)
             ->setParameter('userId', $userId)
@@ -54,6 +54,27 @@ class TransactionService
             ->setParameter('date', $date)
             ->setParameter('description', $description)
             ->addEntityMapping('u', User::class)
+            ->addEntityMapping('t', Transaction::class)
+            ->getOneResult();
+
+        return $transaction;
+
+    }
+
+    public function updateTransactionById(int $id, $amount, $description)
+    {
+        $query = "
+            MATCH(t:Transaction)
+            WHERE ID(t) = {id}
+            SET t.amount = {amount}
+            SET t.description = {description}
+            RETURN t
+        ";
+
+        $transaction = $this->entityManager->createQuery($query)
+            ->setParameter('id', $id)
+            ->setParameter('amount', $amount)
+            ->setParameter('description', $description)
             ->addEntityMapping('t', Transaction::class)
             ->getOneResult();
 

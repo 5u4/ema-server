@@ -8,6 +8,7 @@ use App\Services\TransactionService;
 use App\Http\Resources\TransactionResource;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\Expense\CreateTransactionRequest;
+use Psy\Util\Json;
 
 
 class TransactionController extends Controller
@@ -38,6 +39,14 @@ class TransactionController extends Controller
 
         // create a transaction and create a relationship to current user in Neo
         $transaction = $this->transactionService->create($userId, $request->amount, $request->description);
+
+        return TransactionResource::make($transaction)->response();
+
+    }
+
+    public function update(int $id, CreateTransactionRequest $request): JsonResponse
+    {
+        $transaction = $this->transactionService->updateTransactionById($id, $request->amount, $request->description);
 
         return TransactionResource::make($transaction)->response();
 
