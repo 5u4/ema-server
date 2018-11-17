@@ -210,6 +210,38 @@ class TransactionService
             return $res;
         }
 
+        if ($fragment[0] === '>') {
+            $amount = substr($fragment, 1);
+
+            if (is_numeric($amount) && $transaction->getAmount() > (float)$amount) {
+                return $res;
+            }
+        }
+
+        if ($fragment[0] === '<') {
+            $amount = substr($fragment, 1);
+
+            if (is_numeric($amount) && $transaction->getAmount() < (float)$amount) {
+                return $res;
+            }
+        }
+
+        /* Check if description contains the word */
+        if (strpos($transaction->getDescription(), $fragment) !== false) {
+            return $res;
+        }
+
+        /* Check if date cointains the word */
+        $dateFilterString = strtolower(date(self::DATE_SEARCH_FORMAT, $transaction->getTimestamp()));
+
+        if (strpos($dateFilterString, strtolower($fragment)) !== false) {
+            return $res;
+        }
+
+        if (strlen($fragment) <= 1) {
+            return !$res;
+        }
+
         $twoCharOperator = $fragment[0] . $fragment[1];
 
         if ($twoCharOperator === '>=') {
@@ -228,35 +260,7 @@ class TransactionService
             }
         }
 
-        if ($fragment[0] === '>') {
-            $amount = substr($fragment, 1);
-
-            if (is_numeric($amount) && $transaction->getAmount() > (float)$amount) {
-                return $res;
-            }
-        }
-
-        if ($fragment[0] === '<') {
-            $amount = substr($fragment, 1);
-
-            if (is_numeric($amount) && $transaction->getAmount() < (float)$amount) {
-                return $res;
-            }
-        }
-
         if ($fragment[0] === '<' && $transaction->getAmount() < (float)substr($fragment, 1)) {
-            return $res;
-        }
-
-        /* Check if description contains the word */
-        if (strpos($transaction->getDescription(), $fragment) !== false) {
-            return $res;
-        }
-
-        /* Check if date cointains the word */
-        $dateFilterString = strtolower(date(self::DATE_SEARCH_FORMAT, $transaction->getTimestamp()));
-
-        if (strpos($dateFilterString, strtolower($fragment)) !== false) {
             return $res;
         }
 
