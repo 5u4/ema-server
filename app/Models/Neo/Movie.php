@@ -28,7 +28,7 @@ class Movie
      * @OGM\Property(type="string")
      * @var string
      */
-    protected $movieName;
+    protected $name;
 
     /**
      * @OGM\Relationship(relationshipEntity="WatchMovie", type="WATCH_MOVIE", direction="INCOMING", collection=true, mappedBy="movie")
@@ -73,15 +73,15 @@ class Movie
      */
     public function getMovieName(): string
     {
-        return $this->movieName;
+        return $this->name;
     }
 
     /**
-     * @param string $movieName
+     * @param string $name
      */
-    public function setMovieName($movieName)
+    public function setMovieName($name)
     {
-        $this->movieName = $movieName;
+        $this->name = $name;
     }
 
     /**
