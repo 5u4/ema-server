@@ -18,7 +18,7 @@ class TransactionResource extends JsonResource
             "id" => $this->getId(),
             "amount" => $this->getAmount(),
             "description" => $this->getDescription(),
-            "timestamp" => $this->getTimestamp()
+            "timestamp" => date('Y-m-d', $this->getTimestamp()),
         );
     }
 }
