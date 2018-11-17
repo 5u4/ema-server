@@ -24,8 +24,9 @@ class CreateTransactionRequest extends FormRequest
     public function rules()
     {
         return [
-            'amount' => 'bail|required|numeric|digits_between:1, 20',
-            'description' => 'bail|required|between:1, 120'
+            'amount' => 'required|numeric|digits_between:1, 20',
+            'description' => 'required|between:1, 120|nullable',
+            'timestamp' => 'integer',
         ];
     }
 
@@ -37,7 +38,9 @@ class CreateTransactionRequest extends FormRequest
             'amount.between' => 'Transaction amount should have between :min and :max digits',
 
             'description.required' => 'Transaction description is required',
-            'description.between' => 'Transaction description should have between :min and :max characters'
+            'description.between' => 'Transaction description should have between :min and :max characters',
+
+            'timestamp.integer' => 'Timestamp should be a timestamp',
         ];
     }
 }
