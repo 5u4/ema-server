@@ -116,6 +116,7 @@ class TransactionService
             MATCH (u)-[:HAS_TRANSACTION]->(t:Transaction)
             WHERE ID(t) = {id}
             SET t.amount = {amount}
+            SET t.description = {description}
         ";
 
         if ($timestamp) {
