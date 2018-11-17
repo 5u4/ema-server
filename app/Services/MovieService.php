@@ -25,16 +25,19 @@ class MovieService
     }
 
     /**
-     * @param int $movieId
+     * @param int $userId
      *
      * @return array|mixed
      */
     public function getAllMoviesBelongsToUser(int $userId)
     {
-        $query = "";
+        $query = "
+            MATCH (u:User {sqlId: {id}})-[:WATCH_MOVIE]->(m)
+            RETURN DISTINCT m
+        ";
         return $this->entityManager->createQuery($query)
             ->setParameter('id', $userId)
-            ->addEntityMapping('t', Tag::class)
+            ->addEntityMapping('m', Tag::class)
             ->getResult();
     }
 
@@ -44,17 +47,18 @@ class MovieService
      *
      * @return mixed
      */
-    public function createMovie(int $userId, string $name)
+    public function createMovie(int $userId, string $name, int $movieId)
     {
         $query = "
             MERGE (u:User {sqlId: {id}})
-            MERGE (u)-[:WATCH_MOVIE]->(m:Movie {name: {name}})
+            MERGE (u)-[:WATCH_MOVIE]->(m:Movie {name: {name}, movieId: {movieId}})
             RETURN m
         ";
 
         return $this->entityManager->createQuery($query)
             ->setParameter('id', $userId)
             ->setParameter('name', $name)
+            ->setParameter('movieId', $movieId)
             ->addEntityMapping('m', Movie::class)
             ->getOneResult();
     }
