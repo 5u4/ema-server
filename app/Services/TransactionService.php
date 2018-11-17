@@ -4,120 +4,145 @@ namespace App\Services;
 
 use App\Models\Neo\Transaction;
 use GraphAware\Neo4j\OGM\EntityManager;
-use App\Models\Neo\User;
 
 class TransactionService
 {
+    /** @var EntityManager $entityManager */
     private $entityManager;
 
+    /**
+     * TransactionService constructor.
+     *
+     * @param EntityManager $entityManager
+     */
     public function __construct(EntityManager $entityManager)
     {
         $this->entityManager = $entityManager;
     }
 
-    public function getAll($userId)
+    /**
+     * @param int $userId
+     *
+     * @return array|mixed
+     */
+    public function getAllTransactions(int $userId)
     {
         $query = "
-            MATCH(u:User {sqlId: {sqlId}})-[:HAS_TRANSACTION]->(t:Transaction)
-            RETURN t
+            MATCH (:User {sqlId: {sqlId}})-[:HAS_TRANSACTION]->(t:Transaction)
+            RETURN DISTINCT t
         ";
 
-        $transactions = null;
-
-        $transactions = $this->entityManager->createQuery($query)
+        return $this->entityManager->createQuery($query)
             ->setParameter('sqlId', $userId)
-            ->addEntityMapping('u', User::class)
             ->addEntityMapping('t', Transaction::class)
-            ->execute();
-
-        return $transactions;
-
+            ->getResult();
     }
 
-    public function create($userId, $amount, $description)
+    /**
+     * @param int $userId
+     * @param float $amount
+     * @param string $description
+     * @param int $timestamp
+     *
+     * @return mixed
+     */
+    public function createTransaction(int $userId, float $amount, string $description, int $timestamp)
     {
         $query = "
-            MERGE (u:User {sqlId: {userId}})
-            CREATE (t:Transaction {amount: {amount}, description: {description}, timestamp: {date}})
+            MATCH (u:User {sqlId: {userId}})
+            CREATE (t:Transaction {amount: {amount}, description: {description}, timestamp: {timestamp}})
             CREATE (u)-[:HAS_TRANSACTION]->(t)
             RETURN t
         ";
 
-        // cast transaction amount to float value
-        $amount = floatval($amount);
-
-        $date = Date("Y-m-d", time());
-
-        $transaction = $this->entityManager->createQuery($query)
+        return $this->entityManager->createQuery($query)
             ->setParameter('userId', $userId)
             ->setParameter('amount', $amount)
-            ->setParameter('date', $date)
             ->setParameter('description', $description)
-            ->addEntityMapping('u', User::class)
+            ->setParameter('timestamp', $timestamp)
             ->addEntityMapping('t', Transaction::class)
             ->getOneResult();
-
-        return $transaction;
-
     }
 
-    public function updateTransactionById(int $id, $amount, $description)
+    /**
+     * @param int $userId
+     * @param int $id
+     * @param float $amount
+     * @param string $description
+     * @param int $timestamp
+     *
+     * @return mixed
+     */
+    public function updateTransactionById(int $userId, int $id, float $amount, string $description, ?int $timestamp)
     {
         $query = "
-            MATCH(t:Transaction)
+            MATCH (u:User {sqlId: {uid}})
+            MATCH (u)-[:HAS_TRANSACTION]->(t:Transaction)
             WHERE ID(t) = {id}
             SET t.amount = {amount}
-            SET t.description = {description}
+        ";
+
+        if ($timestamp) {
+            $query .= "
+                SET t.timestamp = $timestamp
+            ";
+        }
+
+        $query .= "
             RETURN t
         ";
 
-        $transaction = $this->entityManager->createQuery($query)
+        return $this->entityManager->createQuery($query)
+            ->setParameter('uid', $userId)
             ->setParameter('id', $id)
             ->setParameter('amount', $amount)
             ->setParameter('description', $description)
             ->addEntityMapping('t', Transaction::class)
             ->getOneResult();
-
-        return $transaction;
-
     }
 
-    public function getTransactionById(int $id)
+    /**
+     * @param int $userId
+     * @param int $id
+     *
+     * @return mixed
+     */
+    public function getUserTransactionById(int $userId, int $id)
     {
         $query = "
-            MATCH(t:Transaction)
+            MATCH (u:User {sqlId: {uid}})
+            MATCH (u)-[:HAS_TRANSACTION]->(t:Transaction)
             WHERE ID(t) = {id}
             RETURN t
         ";
 
-        $transaction = $this->entityManager->createQuery($query)
+        return $this->entityManager->createQuery($query)
+            ->setParameter('uid', $userId)
             ->setParameter('id', $id)
             ->addEntityMapping('t', Transaction::class)
             ->getOneResult();
-
-        return $transaction;
-
     }
 
-    public function deleteTransactionById(int $id)
+    /**
+     * @param int $userId
+     * @param int $id
+     *
+     * @return array|mixed
+     * @throws \Exception
+     */
+    public function deleteTransactionById(int $userId, int $id)
     {
         $query = "
-            MATCH(t:Transaction)-[r:HAS_TRANSACTION]-(u:User)
+            MATCH (u:User {sqlId: {uid}})
+            MATCH (u)-[:HAS_TRANSACTION]->(t:Transaction)
             WHERE ID(t) = {id}
-            DELETE r
-            DELETE t
+            DETACH DELETE t
         ";
 
-        // Get the node first
-        $transaction = $this->getTransactionById($id);
-
-        // Then delete the node
-        $this->entityManager->createQuery($query)
+        return $this->entityManager->createQuery($query)
+            ->setParameter('uid', $userId)
             ->setParameter('id', $id)
             ->addEntityMapping('t', Transaction::class)
             ->execute();
-
-        return $transaction;
-
     }
 }

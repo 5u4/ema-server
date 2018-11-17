@@ -25,8 +25,8 @@ class Transaction
     protected $amount;
 
     /**
-     * @OGM\Property(type="string")
-     * @var string
+     * @OGM\Property(type="int")
+     * @var int
      */
     protected $timestamp;
 
@@ -78,7 +78,7 @@ class Transaction
     /**
      * @return int
      */
-    public function getTimestamp(): string
+    public function getTimestamp(): int
     {
         return $this->timestamp;
     }

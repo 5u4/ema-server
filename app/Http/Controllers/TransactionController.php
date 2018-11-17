@@ -3,68 +3,96 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use App\Services\TransactionService;
 use App\Http\Resources\TransactionResource;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\Expense\CreateTransactionRequest;
-use Psy\Util\Json;
 
-
+/**
+ * Class TransactionController
+ * @package App\Http\Controllers
+ */
 class TransactionController extends Controller
 {
+    /** @var TransactionService $transactionService */
     private $transactionService;
 
+    /**
+     * TransactionController constructor.
+     *
+     * @param TransactionService $transactionService
+     */
     public function __construct(TransactionService $transactionService)
     {
         $this->transactionService = $transactionService;
     }
 
+    /**
+     * @return JsonResponse
+     */
     public function index(): JsonResponse
     {
-        $user = Auth::user();
-        $userId = $user->id;
-
-        $transactions = $this->transactionService->getAll($userId);
+        $transactions = $this->transactionService->getAllTransactions(Auth::id());
 
         return TransactionResource::collection(collect($transactions))->response();
-
     }
 
+    /**
+     * @param CreateTransactionRequest $request
+     *
+     * @return JsonResponse
+     */
     public function create(CreateTransactionRequest $request): JsonResponse
     {
-        // get $user id from current session
-        $user = Auth::user();
-        $userId = $user->id;
+        $transaction = $this->transactionService->createTransaction(
+            Auth::id(), $request->amount, $request->description, $request->timestamp ?? time()
+        );
 
-        // create a transaction and create a relationship to current user in Neo
-        $transaction = $this->transactionService->create($userId, $request->amount, $request->description);
-
-        return TransactionResource::make($transaction)->response();
-
+        return TransactionResource::make($transaction)->response()->setStatusCode(Response::HTTP_CREATED);
     }
 
+    /**
+     * @param int $id
+     * @param CreateTransactionRequest $request
+     *
+     * @return JsonResponse
+     */
     public function update(int $id, CreateTransactionRequest $request): JsonResponse
     {
-        $transaction = $this->transactionService->updateTransactionById($id, $request->amount, $request->description);
+        $transaction = $this->transactionService->updateTransactionById(
+            Auth::id(), $id, $request->amount, $request->description, $request->timestamp ?? null
+        );
 
         return TransactionResource::make($transaction)->response();
-
     }
 
-    public function show(int $id)
+    /**
+     * @param int $id
+     *
+     * @return JsonResponse
+     */
+    public function show(int $id): JsonResponse
     {
-        $transaction = $this->transactionService->getTransactionById($id);
+        $transaction = $this->transactionService->getUserTransactionById(Auth::id(), $id);
 
         return TransactionResource::make($transaction)->response();
-
     }
 
-    public function delete(int $id)
+    /**
+     * @param int $id
+     *
+     * @return JsonResponse
+     * @throws \Exception
+     */
+    public function delete(int $id): JsonResponse
     {
-        $transaction = $this->transactionService->deleteTransactionById($id);
+        $userId = Auth::id();
+
+        $transaction = $this->transactionService->getUserTransactionById($userId, $id);
+
+        $this->transactionService->deleteTransactionById($userId, $id);
 
         return TransactionResource::make($transaction)->response();
-
     }
 }
