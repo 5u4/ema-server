@@ -15,14 +15,15 @@ class UserResource extends JsonResource
      */
     public function toArray($request)
     {
-        $lastLogin = is_null($this->last_login) ? null : $this->last_login->timestamp;
-        $createdAt = is_null($this->{USER::CREATED_AT}) ? null : $this->{USER::CREATED_AT}->timestamp;
-        $updatedAt = is_null($this->{USER::UPDATED_AT}) ? null : $this->{USER::UPDATED_AT}->timestamp;
+        $lastLogin = is_null($this->last_login) ? null : strtotime($this->last_login);
+        $createdAt = is_null($this->{USER::CREATED_AT}) ? null : strtotime($this->{USER::CREATED_AT});
+        $updatedAt = is_null($this->{USER::UPDATED_AT}) ? null : strtotime($this->{USER::UPDATED_AT});
 
         return [
             'id'        => $this->id,
             'username'  => $this->username,
             'email'     => $this->email,
+            'avatarUrl' => action('AvatarController@show', ['user' => $this->id]),
             'lastLogin' => $lastLogin,
             'createdAt' => $createdAt,
             'updatedAt' => $updatedAt,

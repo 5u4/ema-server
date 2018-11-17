@@ -24,8 +24,27 @@ class LoginRequest extends FormRequest
     public function rules()
     {
         return [
-            'email'    => 'required|email',
+            'email'    => 'required|email|exists:users,email',
             'password' => 'required|between:8,80',
+        ];
+    }
+
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array
+     */
+    public function messages()
+    {
+        return [
+            /* Email */
+            'email.required'     => 'The :attribute field is required',
+            'email.email'        => 'The :attribute field should be an valid email',
+            'email.exists'       => 'The :attribute field is not been registered yet',
+
+            /* Password */
+            'password.required'  => 'The :attribute field is required',
+            'password.between'   => 'The :attribute field should be between :min and :max'
         ];
     }
 }

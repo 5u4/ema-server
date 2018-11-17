@@ -24,6 +24,37 @@ Route::group(['prefix' => 'v1'], function () {
     /* Transaction */
     Route::group(['prefix' => 'transaction', 'middleware' => 'auth'], function () {
        Route::post('/', 'TransactionController@create');
+       Route::get('/search/{fragmentString}', 'TransactionController@search');
+       Route::put('/{id}', 'TransactionController@update');
        Route::get('/', 'TransactionController@index');
+       Route::get('/{id}', 'TransactionController@show');
+       Route::delete('/{id}', 'TransactionController@delete');
     });
+<<<<<<< HEAD
+=======
+
+    /* Tag */
+    Route::group(['prefix' => 'tags', 'middleware' => 'auth'], function () {
+        Route::get('/', 'TagController@index');
+        Route::post('/', 'TagController@store');
+        Route::patch('/{tagId}', 'TagController@update');
+        Route::delete('/{tagId}', 'TagController@destroy');
+    });
+
+    /* User */
+    Route::group(['prefix' => 'user', 'middleware' => 'auth'], function () {
+        Route::get('/', 'UserController@index');
+    });
+
+    /* Avatar */
+    Route::group(['prefix' => 'avatars'], function () {
+        Route::get('/{user}', 'AvatarController@show');
+        Route::post('/', 'AvatarController@store')->middleware('auth');
+    });
+
+    /* Dining */
+    Route::group(['prefix' => 'dining', 'middleware' => 'auth'], function () {
+        Route::get('/restaurant_search/{input_text}', 'DiningController@index');
+    });
+>>>>>>> eac23b53ccb4e904be21af57426fc6d584092837
 });

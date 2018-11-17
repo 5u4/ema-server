@@ -36,6 +36,10 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Sql\User withTrashed()
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Sql\User withoutTrashed()
  * @mixin \Eloquent
+ * @property string|null $avatar_path
+ * @property string|null $avatar_name
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sql\User whereAvatarName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sql\User whereAvatarPath($value)
  */
 class User extends Authenticatable
 {
@@ -47,7 +51,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'username', 'email', 'password',
+        'username', 'email', 'password', 'last_login', 'avatar_name', 'avatar_path',
     ];
 
     /**
