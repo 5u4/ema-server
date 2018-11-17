@@ -18,12 +18,8 @@ class TransactionService
      * m: 01 through 12
      * d: 01 to 31
      * a: am or pm
-     * A: AM or PM
-     * H: 00 through 23
-     * i: 00 to 59
-     * s: 00 through 59
      */
-    private const DATE_SEARCH_FORMAT = 'D l F M YYYY mm dd a A HH:ii:ss';
+    private const DATE_SEARCH_FORMAT = 'D l F M Y m d a';
 
     private const TRANSACTION_SEARCH_DELIMITER = ",";
 
@@ -50,6 +46,7 @@ class TransactionService
         $query = "
             MATCH (:User {sqlId: {sqlId}})-[:HAS_TRANSACTION]->(t:Transaction)
             RETURN DISTINCT t
+            ORDER BY t.timestamp DESC
         ";
 
         return $this->entityManager->createQuery($query)
