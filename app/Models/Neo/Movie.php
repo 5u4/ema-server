@@ -10,7 +10,6 @@ use GraphAware\Neo4j\OGM\Common\Collection;
  *
  * @OGM\Node (label="Movie")
  */
-
 class Movie
 {
     /**
@@ -32,18 +31,17 @@ class Movie
     protected $movieName;
 
     /**
-     * @var Collection
-     *
      * @OGM\Relationship(relationshipEntity="WatchMovie", type="WATCH_MOVIE", direction="INCOMING", collection=true, mappedBy="movie")
+     * @var User[]|Collection
      */
-    protected $watchMovie;
+    protected $users;
 
     /**
      * Movie constructor.
      */
     public function __construct()
     {
-        $this->watchMovie = new Collection();
+        $this->users = new Collection();
     }
 
     /**
@@ -65,7 +63,7 @@ class Movie
     /**
      * @param int $movieId
      */
-    public function setAmount($movieId)
+    public function setMovieId($movieId)
     {
         $this->movieId = $movieId;
     }
@@ -87,18 +85,11 @@ class Movie
     }
 
     /**
-     * @return WatchMovie
+     * @return User[]|Collection
      */
-    public function getHasTransaction(): WatchMovie
+    public function getUsers()
     {
-        return $this->watchMovie;
+        return $this->users;
     }
 
-    /**
-     * @param $watchMovie
-     */
-    public function setHasTransaction($watchMovie)
-    {
-        $this->watchMovie = $watchMovie;
-    }
 }
