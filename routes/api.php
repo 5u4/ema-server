@@ -30,6 +30,14 @@ Route::group(['prefix' => 'v1'], function () {
        Route::delete('/{id}', 'TransactionController@delete');
     });
 
+    /* Tag */
+    Route::group(['prefix' => 'tags', 'middleware' => 'auth'], function () {
+        Route::get('/', 'TagController@index');
+        Route::post('/', 'TagController@store');
+        Route::patch('/{tagId}', 'TagController@update');
+        Route::delete('/{tagId}', 'TagController@destroy');
+    });
+
     /* User */
     Route::group(['prefix' => 'user', 'middleware' => 'auth'], function () {
         Route::get('/', 'UserController@index');

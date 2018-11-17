@@ -32,6 +32,12 @@ class User
     protected $hasTransaction;
 
     /**
+     * @OGM\Relationship(type="HAS_TAG", direction="OUTGOING", collection=true, mappedBy="users", targetEntity="Tag")
+     * @var Tag[]|Collection
+     */
+    protected $tags;
+
+    /**
      * User constructor.
      */
     public function __construct()
@@ -77,5 +83,13 @@ class User
     public function setHasTransaction($hasTransaction)
     {
         $this->hasTransaction = $hasTransaction;
+    }
+
+    /**
+     * @return Tag[]|Collection
+     */
+    public function getTags()
+    {
+        return $this->tags;
     }
 }
