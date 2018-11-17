@@ -24,6 +24,7 @@ Route::group(['prefix' => 'v1'], function () {
     /* Transaction */
     Route::group(['prefix' => 'transaction', 'middleware' => 'auth'], function () {
        Route::post('/', 'TransactionController@create');
+       Route::get('/search/{fragmentString}', 'TransactionController@search');
        Route::put('/{id}', 'TransactionController@update');
        Route::get('/', 'TransactionController@index');
        Route::get('/{id}', 'TransactionController@show');

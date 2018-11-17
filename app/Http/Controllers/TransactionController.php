@@ -39,6 +39,22 @@ class TransactionController extends Controller
     }
 
     /**
+     * @param string $fragmentString
+     *
+     * @return JsonResponse
+     */
+    public function search(string $fragmentString): JsonResponse
+    {
+        $transactions = $this->transactionService->getAllTransactions(Auth::id());
+
+        $filteredTransactions = $this->transactionService->filterTransactionsWithFragments(
+            $transactions, $fragmentString
+        );
+
+        return TransactionResource::collection(collect($filteredTransactions))->response();
+    }
+
+    /**
      * @param CreateTransactionRequest $request
      *
      * @return JsonResponse
