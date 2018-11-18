@@ -120,6 +120,26 @@ class UserService
 
     /**
      * @param int $id
+     * @param int $unFollowingId
+     *
+     * @return array|mixed
+     * @throws \Exception
+     */
+    public function unFollowUser(int $id, int $unFollowingId)
+    {
+        $query = "
+            MATCH (:User {sqlId: {id}})-[r:FOLLOW]->(:User {sqlId: {fid}})
+            DELETE r
+        ";
+
+        return $this->entityManager->createQuery($query)
+            ->setParameter('id', $id)
+            ->setParameter('fid', $unFollowingId)
+            ->execute();
+    }
+
+    /**
+     * @param int $id
      *
      * @return mixed
      */

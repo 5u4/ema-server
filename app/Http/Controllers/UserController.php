@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\NeoUserResource;
 use App\Http\Resources\UserResource;
 use App\Models\Sql\User;
 use Illuminate\Http\JsonResponse;
@@ -59,6 +58,19 @@ class UserController extends Controller
     {
         $following = $this->userService->followUser(Auth::id(), $user->id);
 
-        return NeoUserResource::make($following)->response();
+        return UserResource::make(User::find($following->getSqlId()))->response();
+    }
+
+    /**
+     * @param User $user
+     *
+     * @return JsonResponse
+     * @throws \Exception
+     */
+    public function unFollow(User $user): JsonResponse
+    {
+        $this->userService->unFollowUser(Auth::id(), $user->id);
+
+        return UserResource::make($user)->response();
     }
 }
