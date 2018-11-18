@@ -45,6 +45,7 @@ Route::group(['prefix' => 'v1'], function () {
         Route::get('/{user}', 'UserController@show');
         Route::get('/{input}','UserController@search');
         Route::post('/followings/{user}', 'UserController@follow');
+        Route::delete('/followings/{user}', 'UserController@unFollow');
     });
 
     /* Avatar */
