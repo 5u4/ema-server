@@ -34,7 +34,6 @@ class UserController extends Controller
     {
         $userList = $this->userService->searchUser($input);
 
-       // dd($userList);
         return UserResource::collection(collect($userList))->response();
     }
   
