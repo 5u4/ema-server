@@ -12,6 +12,8 @@ use GraphAware\Neo4j\OGM\EntityManager;
  */
 class UserService
 {
+    private const FRIEND_SUGGESTION_LIMIT = 5;
+
     private $entityManager;
 
     /**
@@ -192,5 +194,35 @@ class UserService
         }
 
         return $followings;
+    }
+
+    /**
+     * @param int $id
+     *
+     * @return array
+     */
+    public function getCommonFriends(int $id): array
+    {
+        $query = "
+            MATCH (u:User {sqlId: {id}})-[:FOLLOW]->(friends:User)-[:FOLLOW]->(u)
+            MATCH (friends)-[:FOLLOW]->(commonfriends:User)-[:FOLLOW]->(friends)
+            WHERE NOT (u)-[:FOLLOW]->(commonfriends)
+            AND NOT commonfriends.sqlId = {id}
+            RETURN count(commonfriends) AS occurrence, commonfriends.sqlId AS commonFriendId
+            ORDER BY occurrence DESC LIMIT {limit}
+        ";
+
+        $result = $this->entityManager->createQuery($query)
+            ->setParameter('id', $id)
+            ->setParameter('limit', self::FRIEND_SUGGESTION_LIMIT)
+            ->getResult();
+
+        $friends = [];
+
+        foreach ($result as $friend) {
+            $friends[] = User::find($friend['commonFriendId']);
+        }
+
+        return $friends;
     }
 }

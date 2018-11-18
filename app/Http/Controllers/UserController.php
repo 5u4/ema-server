@@ -50,6 +50,16 @@ class UserController extends Controller
     }
 
     /**
+     * @return JsonResponse
+     */
+    public function commonfriends(): JsonResponse
+    {
+        $users = $this->userService->getCommonFriends(Auth::id());
+
+        return UserResource::collection(collect($users))->response();
+    }
+
+    /**
      * @param User $user
      *
      * @return JsonResponse
@@ -67,7 +77,7 @@ class UserController extends Controller
      * @return JsonResponse
      * @throws \Exception
      */
-    public function unFollow(User $user): JsonResponse
+    public function unfollow(User $user): JsonResponse
     {
         $this->userService->unFollowUser(Auth::id(), $user->id);
 

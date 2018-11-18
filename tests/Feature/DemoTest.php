@@ -17,8 +17,8 @@ use Tests\TestCase;
 class DemoTest extends TestCase
 {
     private const TEST_USERNAME = 'Alex';
-    private const TEST_EMAIL    = 'wongsenw@sfu.ca';
-    private const TEST_PASSWORD = 'testpassword';
+    private const TEST_EMAIL    = 'demo@sfu.ca';
+    private const TEST_PASSWORD = 'password';
 
     /** @var EntityManager $entityManager */
     private $entityManager;
