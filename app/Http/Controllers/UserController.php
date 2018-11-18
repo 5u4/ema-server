@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\NeoUserResource;
 use App\Http\Resources\UserResource;
+use App\Models\Sql\User;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use App\Services\UserService;
 use Illuminate\Support\Facades\Auth;
 
@@ -17,10 +18,22 @@ class UserController extends Controller
     {
         $this->userService = $userService;
     }
-    
-    public function show(): JsonResponse
+
+    /**
+     * @param User $user
+     *
+     * @return JsonResponse
+     */
+    public function show(User $user): JsonResponse
     {
-        return UserResource::make(Auth::user())->response();
+        $id = $user->id;
+
+        $relationships = [
+            'followings' => UserResource::collection(collect($this->userService->getUserFollowingsInSql($id))),
+            'followers' => UserResource::collection(collect($this->userService->getUserFollowersInSql($id))),
+        ];
+
+        return UserResource::make($user)->additional($relationships)->response();
     }
     
     public function index(): JsonResponse
@@ -36,6 +49,16 @@ class UserController extends Controller
 
         return UserResource::collection(collect($userList))->response();
     }
-  
 
+    /**
+     * @param User $user
+     *
+     * @return JsonResponse
+     */
+    public function follow(User $user): JsonResponse
+    {
+        $following = $this->userService->followUser(Auth::id(), $user->id);
+
+        return NeoUserResource::make($following)->response();
+    }
 }

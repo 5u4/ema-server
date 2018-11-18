@@ -96,4 +96,81 @@ class UserService
         return $users;
     }
 
+    /**
+     * @param int $id
+     * @param int $followingId
+     *
+     * @return mixed
+     */
+    public function followUser(int $id, int $followingId)
+    {
+        $query = "
+            MATCH (u:User {sqlId: {id}})
+            MATCH (following:User {sqlId: {fid}})
+            MERGE (u)-[:FOLLOW]->(following)
+            RETURN following
+        ";
+
+        return $this->entityManager->createQuery($query)
+            ->setParameter('id', $id)
+            ->setParameter('fid', $followingId)
+            ->addEntityMapping('following', NeoUser::class)
+            ->getOneResult();
+    }
+
+    /**
+     * @param int $id
+     *
+     * @return mixed
+     */
+    public function getNeoUser(int $id)
+    {
+        $query = "
+            MATCH (u:User {sqlId: {id}})
+            RETURN u
+        ";
+
+        return $this->entityManager->createQuery($query)
+            ->setParameter('id', $id)
+            ->addEntityMapping('u', NeoUser::class)
+            ->getOneResult();
+    }
+
+    /**
+     * @param int $id
+     *
+     * @return array
+     */
+    public function getUserFollowersInSql(int $id): array
+    {
+        /** @var NeoUser $user */
+        $user = $this->getNeoUser($id);
+
+        $followers = [];
+
+        foreach ($user->getFollowers() as $follower) {
+            $followers[] = User::find($follower->getSqlId());
+        }
+
+        return $followers;
+    }
+
+    /**
+     * @param int $id
+     *
+     * @return array
+     */
+    public function getUserFollowingsInSql(int $id): array
+    {
+        /** @var NeoUser $user */
+        $user = $this->getNeoUser($id);
+
+        $followings = [];
+
+        foreach ($user->getFollowings() as $following) {
+            $followings[] = User::find($following->getSqlId());
+        }
+
+        return $followings;
+    }
 }
