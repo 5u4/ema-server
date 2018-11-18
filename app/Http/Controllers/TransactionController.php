@@ -61,8 +61,10 @@ class TransactionController extends Controller
      */
     public function create(CreateTransactionRequest $request): JsonResponse
     {
+        $tags = $request->tags ? explode(',', $request->tags) : [];
+
         $transaction = $this->transactionService->createTransaction(
-            Auth::id(), $request->amount, $request->description, $request->timestamp ?? time()
+            Auth::id(), $request->amount, $request->description, $request->timestamp ?? time(), $tags
         );
 
         return TransactionResource::make($transaction)->response()->setStatusCode(Response::HTTP_CREATED);

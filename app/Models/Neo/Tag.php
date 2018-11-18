@@ -12,6 +12,10 @@ use GraphAware\Neo4j\OGM\Common\Collection;
  */
 class Tag
 {
+    public const TAG_COLORS = [
+        'magenta', 'red', 'volcano', 'orange', 'gold', 'lime', 'green', 'cyan', 'blue', 'geekblue', 'purple',
+    ];
+
     /**
      * @OGM\GraphId()
      * @var int
@@ -31,6 +35,21 @@ class Tag
     protected $users;
 
     /**
+     * @OGM\Relationship(type="TAGGED_AS", direction="INCOMING", collection=true, mappedBy="tags", targetEntity="Transaction")
+     * @var Transaction[]|Collection
+     */
+    protected $transactions;
+
+    /**
+     * Tag constructor.
+     */
+    public function __construct()
+    {
+        $this->users = new Collection();
+        $this->transactions = new Collection();
+    }
+
+    /**
      * @return int
      */
     public function getId(): int
@@ -44,6 +63,16 @@ class Tag
     public function getName(): string
     {
         return $this->name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getColor(): string
+    {
+        $index = ord($this->name[0]) % count(self::TAG_COLORS);
+
+        return self::TAG_COLORS[$index];
     }
 
     /**

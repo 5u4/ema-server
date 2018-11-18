@@ -27,6 +27,7 @@ class CreateTransactionRequest extends FormRequest
             'amount' => 'required|numeric|digits_between:1, 20',
             'description' => 'required|between:1, 120|nullable',
             'timestamp' => 'integer',
+            'tag' => 'string',
         ];
     }
 

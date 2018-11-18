@@ -44,11 +44,18 @@ class Transaction
     protected $hasTransaction;
 
     /**
+     * @OGM\Relationship(type="TAGGED_AS", direction="OUTGOING", collection=true, mappedBy="transactions", targetEntity="Tag")
+     * @var Tag[]|Collection
+     */
+    public $tags;
+
+    /**
      * Transaction constructor.
      */
     public function __construct()
     {
         $this->hasTransaction = new Collection();
+        $this->tags = new Collection();
     }
 
     /**
@@ -121,5 +128,13 @@ class Transaction
     public function setHasTransaction($hasTransaction)
     {
         $this->hasTransaction = $hasTransaction;
+    }
+
+    /**
+     * @return Tag[]|Collection
+     */
+    public function getTags()
+    {
+        return $this->tags;
     }
 }
