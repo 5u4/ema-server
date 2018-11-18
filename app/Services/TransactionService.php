@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Http\Resources\TransactionResource;
 use App\Models\Neo\Tag;
 use App\Models\Neo\Transaction;
 use GraphAware\Neo4j\OGM\EntityManager;
@@ -23,6 +24,12 @@ class TransactionService
     private const DATE_SEARCH_FORMAT = 'D l F M Y-m-d a';
 
     private const TRANSACTION_SEARCH_DELIMITER = " ";
+
+    private const TRANSACTION_SEARCH_NEGATION_SYMBOL = '!';
+
+    private const TRANSACTION_SEARCH_TAG_SYMBOL = '#';
+
+    private const TRANSACTION_PIE_CHART_UNTAGGED = 'untagged';
 
     /** @var EntityManager $entityManager */
     private $entityManager;
@@ -73,6 +80,79 @@ class TransactionService
         }
 
         return $transactions;
+    }
+
+    /**
+     * @param array $transactions
+     *
+     * @return array
+     */
+    public function getMetaDataFromGivenTransactions(array $transactions): array
+    {
+        $totalAmount = 0;
+        /** @var Transaction $singleMinExpense */
+        $singleMinExpense = null;
+        /** @var Transaction $singleMaxExpense */
+        $singleMaxExpense = null;
+
+        /** @var Transaction $transaction */
+        foreach ($transactions as $transaction) {
+            $transactionAmount = $transaction->getAmount();
+
+            $totalAmount += $transactionAmount;
+
+            if ($singleMinExpense === null || $transactionAmount < $singleMinExpense->getAmount()) {
+                $singleMinExpense = $transaction;
+            }
+
+            if ($singleMaxExpense === null || $transactionAmount > $singleMinExpense->getAmount()) {
+                $singleMaxExpense = $transaction;
+            }
+        }
+
+        return [
+            'totalAmount' => number_format($totalAmount, 2, '.', ''),
+            'minExpense' => TransactionResource::make($singleMinExpense),
+            'maxExpense' => TransactionResource::make($singleMaxExpense),
+            'pieChart' => $this->generatePieChart($transactions),
+        ];
+    }
+
+    /**
+     * @param array $transactions
+     *
+     * @return array
+     */
+    private function generatePieChart(array $transactions): array
+    {
+        $results = [self::TRANSACTION_PIE_CHART_UNTAGGED => 0];
+
+
+        /** @var Transaction $transaction */
+        foreach ($transactions as $transaction) {
+            $amount = $transaction->getAmount();
+
+            $tagCount = 0;
+
+            /** @var Tag $tag */
+            foreach ($transaction->getTags() as $tag) {
+                $tagName = $tag->getName();
+
+                if (isset($results[$tagName])) {
+                    $results[$tagName] += $amount;
+                } else {
+                    $results[$tagName] = $amount;
+                }
+
+                $tagCount++;
+            }
+
+            if ($tagCount === 0) {
+                $results[self::TRANSACTION_PIE_CHART_UNTAGGED] += $amount;
+            }
+        }
+
+        return $results;
     }
 
     /**
@@ -224,9 +304,13 @@ class TransactionService
         $res = true;
 
         /* Handle negation */
-        if ($fragment[0] == '!') {
+        if ($fragment[0] == self::TRANSACTION_SEARCH_NEGATION_SYMBOL) {
             $res = false;
             $fragment = substr($fragment, 1);
+        }
+
+        if ($fragment === '') {
+            return $res;
         }
 
         /* Amount comparison */
@@ -279,7 +363,7 @@ class TransactionService
         }
 
         /* Check tags */
-        if ($fragment[0] === ':') {
+        if ($fragment[0] === self::TRANSACTION_SEARCH_TAG_SYMBOL) {
             $fragment = substr($fragment, 1);
 
             $tagString = '';
