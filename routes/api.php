@@ -30,8 +30,6 @@ Route::group(['prefix' => 'v1'], function () {
        Route::get('/{id}', 'TransactionController@show');
        Route::delete('/{id}', 'TransactionController@delete');
     });
-<<<<<<< HEAD
-=======
 
     /* Tag */
     Route::group(['prefix' => 'tags', 'middleware' => 'auth'], function () {
@@ -57,5 +55,10 @@ Route::group(['prefix' => 'v1'], function () {
     Route::group(['prefix' => 'dining', 'middleware' => 'auth'], function () {
         Route::get('/restaurant_search/{input_text}', 'DiningController@index');
     });
->>>>>>> eac23b53ccb4e904be21af57426fc6d584092837
+
+    /* Movie */
+    Route::group(['prefix' => 'movies', 'middleware' => 'auth'], function(){
+        Route::get('/', 'MovieController@index');
+        Route::post('/','MovieController@store');
+    });
 });
