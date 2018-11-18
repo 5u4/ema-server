@@ -78,8 +78,10 @@ class TransactionController extends Controller
      */
     public function update(int $id, CreateTransactionRequest $request): JsonResponse
     {
+        $tags = $request->tags ? explode(',', $request->tags) : [];
+
         $transaction = $this->transactionService->updateTransactionById(
-            Auth::id(), $id, $request->amount, $request->description, $request->timestamp ?? null
+            Auth::id(), $id, $request->amount, $request->description, $request->timestamp ?? null, $tags ?? []
         );
 
         return TransactionResource::make($transaction)->response();
