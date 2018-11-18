@@ -248,7 +248,7 @@ class TransactionService
         }
 
         /* Check if description contains the word */
-        if (strpos($transaction->getDescription(), $fragment) !== false) {
+        if (strpos(strtolower($transaction->getDescription()), $fragment) !== false) {
             return $res;
         }
 
