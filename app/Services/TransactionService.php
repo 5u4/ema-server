@@ -20,7 +20,7 @@ class TransactionService
      * d: 01 to 31
      * a: am or pm
      */
-    private const DATE_SEARCH_FORMAT = 'D l F M Y m d a';
+    private const DATE_SEARCH_FORMAT = 'D l F M Y-m-d a';
 
     private const TRANSACTION_SEARCH_DELIMITER = " ";
 
@@ -215,6 +215,10 @@ class TransactionService
      */
     private function isTransactionMatchFilter(Transaction $transaction, string $fragment): bool
     {
+        if ($fragment === '') {
+            return true;
+        }
+
         $fragment = strtolower($fragment);
 
         $res = true;
@@ -278,15 +282,15 @@ class TransactionService
         if ($fragment[0] === ':') {
             $fragment = substr($fragment, 1);
 
-            if (strlen($fragment) === 0) {
-                return !$res;
-            }
-
             $tagString = '';
 
             /** @var Tag $tag */
             foreach ($transaction->getTags() as $tag) {
                 $tagString .= $tag->getName();
+            }
+
+            if ($fragment === '') {
+                return $fragment === $tagString ? !$res : $res;
             }
 
             if (strpos(strtolower($tagString), $fragment) !== false) {

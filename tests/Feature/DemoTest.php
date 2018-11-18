@@ -198,7 +198,7 @@ class DemoTest extends TestCase
             ],
             [
                 'amount'      => 3,
-                'description' => 'Lost again in CMPT 470 lecture :(',
+                'description' => 'Lost again in CMPT 470 lecture',
                 'timestamp'   => 1542306600,
                 'tags'        => 'lost',
             ],
