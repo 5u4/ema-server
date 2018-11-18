@@ -43,7 +43,29 @@ class MovieService
 
     /**
      * @param int $userId
+     * @param int $movieId
+     *
+     * @return mixed
+     */
+    public function getUserTag(int $userId, int $movieId)
+    {
+        $query = "
+            MATCH (u:User {sqlId: {uid}})
+            MATCH (u)-[:WATCH_MOVIE]->(m:Movie) WHERE ID(m) = {id}
+            RETURN m
+        ";
+
+        return $this->entityManager->createQuery($query)
+            ->setParameter('uid', $userId)
+            ->setParameter('id', $movieId)
+            ->addEntityMapping('m', Movie::class)
+            ->getOneResult();
+    }
+
+    /**
+     * @param int $userId
      * @param string $name
+     * @param int $movieId
      *
      * @return mixed
      */
