@@ -33,7 +33,7 @@ class DemoTest extends TestCase
     protected function setUp()
     {
         parent::setUp();
-        Artisan::call('migrate:refresh');
+        Artisan::call('migrate:refresh', ['--seed' => true]);
         $this->entityManager = $this->app->make(EntityManager::class);
     }
 
