@@ -119,10 +119,11 @@ class TransactionService
      * @param float $amount
      * @param string $description
      * @param int $timestamp
+     * @param array $tags
      *
      * @return mixed
      */
-    public function updateTransactionById(int $userId, int $id, float $amount, string $description, ?int $timestamp)
+    public function updateTransactionById(int $userId, int $id, float $amount, string $description, ?int $timestamp, array $tags = [])
     {
         $query = "
             MATCH (u:User {sqlId: {uid}})
@@ -135,6 +136,15 @@ class TransactionService
         if ($timestamp) {
             $query .= "
                 SET t.timestamp = $timestamp
+            ";
+        }
+
+        foreach ($tags as $k => $tag) {
+            $tag = trim($tag);
+
+            $query .= "
+                MERGE (u)-[:HAS_TAG]->(t$k:Tag {name: '$tag'})
+                MERGE (t)-[:TAGGED_AS]->(t$k)
             ";
         }
 
