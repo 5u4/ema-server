@@ -52,7 +52,11 @@ class TransactionController extends Controller
             $transactions, $request->fragment ?? ''
         );
 
-        return TransactionResource::collection(collect($filteredTransactions))->response();
+        $metaData = $request->withMeta
+            ? $this->transactionService->getMetaDataFromGivenTransactions($filteredTransactions)
+            : null;
+
+        return TransactionResource::collection(collect($filteredTransactions))->additional(['meta' => $metaData])->response();
     }
 
     /**
