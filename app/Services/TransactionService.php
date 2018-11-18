@@ -79,15 +79,28 @@ class TransactionService
      * @param float $amount
      * @param string $description
      * @param int $timestamp
+     * @param array $tags
      *
      * @return mixed
      */
-    public function createTransaction(int $userId, float $amount, string $description, int $timestamp)
+    public function createTransaction(int $userId, float $amount, string $description, int $timestamp, array $tags = [])
     {
         $query = "
             MATCH (u:User {sqlId: {userId}})
             CREATE (t:Transaction {amount: {amount}, description: {description}, timestamp: {timestamp}})
             CREATE (u)-[:HAS_TRANSACTION]->(t)
+        ";
+
+        foreach ($tags as $k => $tag) {
+            $tag = trim($tag);
+
+            $query .= "
+                MERGE (u)-[:HAS_TAG]->(t$k:Tag {name: '$tag'})
+                MERGE (t)-[:TAGGED_AS]->(t$k)
+            ";
+        }
+
+        $query .= "
             RETURN t
         ";
 
