@@ -30,7 +30,13 @@ class UserController extends Controller
         return UserResource::collection(collect(User::all()))->response();
     }
 
+    public function search(string $input):JsonResponse
+    {
+        $userList = $this->userService->searchUser($input);
 
+       // dd($userList);
+        return UserResource::collection(collect($userList))->response();
+    }
   
 
 }
