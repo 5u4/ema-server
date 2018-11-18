@@ -47,7 +47,7 @@ class Transaction
      * @OGM\Relationship(type="TAGGED_AS", direction="OUTGOING", collection=true, mappedBy="transactions", targetEntity="Tag")
      * @var Tag[]|Collection
      */
-    public $tags;
+    protected $tags;
 
     /**
      * Transaction constructor.

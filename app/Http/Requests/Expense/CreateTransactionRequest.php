@@ -24,8 +24,8 @@ class CreateTransactionRequest extends FormRequest
     public function rules()
     {
         return [
-            'amount' => 'required|numeric|digits_between:1, 20',
-            'description' => 'required|between:1, 120|nullable',
+            'amount' => 'required|numeric',
+            'description' => 'required|between:1,120',
             'timestamp' => 'integer',
             'tag' => 'string',
         ];
@@ -36,7 +36,6 @@ class CreateTransactionRequest extends FormRequest
         return [
             'amount.required' => 'Transaction amount is required',
             'amount.numeric' => 'Transaction amount must be numeric',
-            'amount.between' => 'Transaction amount should have between :min and :max digits',
 
             'description.required' => 'Transaction description is required',
             'description.between' => 'Transaction description should have between :min and :max characters',

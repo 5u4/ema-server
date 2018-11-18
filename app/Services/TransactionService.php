@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Neo\Tag;
 use App\Models\Neo\Transaction;
 use GraphAware\Neo4j\OGM\EntityManager;
 
@@ -21,7 +22,7 @@ class TransactionService
      */
     private const DATE_SEARCH_FORMAT = 'D l F M Y m d a';
 
-    private const TRANSACTION_SEARCH_DELIMITER = ",";
+    private const TRANSACTION_SEARCH_DELIMITER = " ";
 
     /** @var EntityManager $entityManager */
     private $entityManager;
@@ -214,6 +215,8 @@ class TransactionService
      */
     private function isTransactionMatchFilter(Transaction $transaction, string $fragment): bool
     {
+        $fragment = strtolower($fragment);
+
         $res = true;
 
         /* Handle negation */
@@ -237,6 +240,12 @@ class TransactionService
             if (is_numeric($amount) && $transaction->getAmount() > (float)$amount) {
                 return $res;
             }
+
+            $fragTime = strtotime($amount);
+
+            if ($fragTime !== false && $transaction->getTimestamp() > $fragTime) {
+                return $res;
+            }
         }
 
         if ($fragment[0] === '<') {
@@ -245,20 +254,49 @@ class TransactionService
             if (is_numeric($amount) && $transaction->getAmount() < (float)$amount) {
                 return $res;
             }
+
+            $fragTime = strtotime($amount);
+
+            if ($fragTime !== false && $transaction->getTimestamp() < $fragTime) {
+                return $res;
+            }
         }
 
         /* Check if description contains the word */
-        if (strpos($transaction->getDescription(), $fragment) !== false) {
+        if (strpos(strtolower($transaction->getDescription()), $fragment) !== false) {
             return $res;
         }
 
         /* Check if date cointains the word */
         $dateFilterString = strtolower(date(self::DATE_SEARCH_FORMAT, $transaction->getTimestamp()));
 
-        if (strpos($dateFilterString, strtolower($fragment)) !== false) {
+        if (strpos($dateFilterString, $fragment) !== false) {
             return $res;
         }
 
+        /* Check tags */
+        if ($fragment[0] === ':') {
+            $fragment = substr($fragment, 1);
+
+            if (strlen($fragment) === 0) {
+                return !$res;
+            }
+
+            $tagString = '';
+
+            /** @var Tag $tag */
+            foreach ($transaction->getTags() as $tag) {
+                $tagString .= $tag->getName();
+            }
+
+            if (strpos(strtolower($tagString), $fragment) !== false) {
+                return $res;
+            }
+
+            return !$res;
+        }
+
+        /* Check two chars comparison operator */
         if (strlen($fragment) <= 1) {
             return !$res;
         }
@@ -271,6 +309,12 @@ class TransactionService
             if (is_numeric($amount) && $transaction->getAmount() >= (float)$amount) {
                 return $res;
             }
+
+            $fragTime = strtotime($amount);
+
+            if ($fragTime !== false && $transaction->getTimestamp() >= $fragTime) {
+                return $res;
+            }
         }
 
         if ($twoCharOperator === '<=') {
@@ -279,10 +323,12 @@ class TransactionService
             if (is_numeric($amount) && $transaction->getAmount() <= (float)$amount) {
                 return $res;
             }
-        }
 
-        if ($fragment[0] === '<' && $transaction->getAmount() < (float)substr($fragment, 1)) {
-            return $res;
+            $fragTime = strtotime($amount);
+
+            if ($fragTime !== false && $transaction->getTimestamp() <= $fragTime) {
+                return $res;
+            }
         }
 
         return !$res;
