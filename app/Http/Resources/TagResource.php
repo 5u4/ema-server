@@ -17,8 +17,9 @@ class TagResource extends JsonResource
     {
         /** @var Tag $this */
         return [
-            'id'   => $this->getId(),
-            'name' => $this->getName(),
+            'id'    => $this->getId(),
+            'name'  => $this->getName(),
+            'color' => $this->getColor(),
         ];
     }
 }

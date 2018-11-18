@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\Neo\Transaction;
 use GraphAware\Neo4j\OGM\EntityManager;
-use Symfony\Component\Debug\Exception\FatalThrowableError;
 
 class TransactionService
 {
@@ -19,14 +18,10 @@ class TransactionService
      * m: 01 through 12
      * d: 01 to 31
      * a: am or pm
-     * A: AM or PM
-     * H: 00 through 23
-     * i: 00 to 59
-     * s: 00 through 59
      */
-    private const DATE_SEARCH_FORMAT = 'D l F M YYYY mm dd a A HH:ii:ss';
+    private const DATE_SEARCH_FORMAT = 'D l F M Y m d a';
 
-    private const TRANSACTION_SEARCH_DELIMITER = " ,\n.";
+    private const TRANSACTION_SEARCH_DELIMITER = ",";
 
     /** @var EntityManager $entityManager */
     private $entityManager;
@@ -51,6 +46,7 @@ class TransactionService
         $query = "
             MATCH (:User {sqlId: {sqlId}})-[:HAS_TRANSACTION]->(t:Transaction)
             RETURN DISTINCT t
+            ORDER BY t.timestamp DESC
         ";
 
         return $this->entityManager->createQuery($query)
@@ -71,7 +67,7 @@ class TransactionService
 
         foreach ($fragments as $fragment) {
             $transactions = array_filter($transactions, function ($transaction) use ($fragment) {
-                return $this->isTransactionMatchFilter($transaction, $fragment);
+                return $this->isTransactionMatchFilter($transaction, trim($fragment));
             });
         }
 
@@ -79,73 +75,32 @@ class TransactionService
     }
 
     /**
-     * @param Transaction $transaction
-     * @param string $fragment
-     *
-     * @return bool
-     */
-    private function isTransactionMatchFilter(Transaction $transaction, string $fragment): bool
-    {
-        $res = true;
-
-        /* Handle negation */
-        if ($fragment[0] == '!') {
-            $res = false;
-            $fragment = substr($fragment, 1);
-        }
-
-        /* Amount comparison */
-        if ($fragment[0] === '=' && $transaction->getAmount() == substr($fragment, 1)) {
-            return $res;
-        }
-
-        $twoCharOperator = $fragment[0] . $fragment[1];
-
-        if ($twoCharOperator === '>=' && $transaction->getAmount() >= substr($fragment, 2)) {
-            return $res;
-        }
-
-        if ($twoCharOperator === '>=' && $transaction->getAmount() <= substr($fragment, 2)) {
-            return $res;
-        }
-
-        if ($fragment[0] === '>' && $transaction->getAmount() > substr($fragment, 1)) {
-            return $res;
-        }
-
-        if ($fragment[0] === '<' && $transaction->getAmount() < substr($fragment, 1)) {
-            return $res;
-        }
-
-        /* Check if description contains the word */
-        if (strpos($transaction->getDescription(), $fragment) !== false) {
-            return $res;
-        }
-
-        /* Check if date cointains the word */
-        $dateFilterString = strtolower(date(self::DATE_SEARCH_FORMAT, $transaction->getTimestamp()));
-
-        if (strpos($dateFilterString, strtolower($fragment)) !== false) {
-            return $res;
-        }
-
-        return !$res;
-    }
-
-    /**
      * @param int $userId
      * @param float $amount
      * @param string $description
      * @param int $timestamp
+     * @param array $tags
      *
      * @return mixed
      */
-    public function createTransaction(int $userId, float $amount, string $description, int $timestamp)
+    public function createTransaction(int $userId, float $amount, string $description, int $timestamp, array $tags = [])
     {
         $query = "
             MATCH (u:User {sqlId: {userId}})
             CREATE (t:Transaction {amount: {amount}, description: {description}, timestamp: {timestamp}})
             CREATE (u)-[:HAS_TRANSACTION]->(t)
+        ";
+
+        foreach ($tags as $k => $tag) {
+            $tag = trim($tag);
+
+            $query .= "
+                MERGE (u)-[:HAS_TAG]->(t$k:Tag {name: '$tag'})
+                MERGE (t)-[:TAGGED_AS]->(t$k)
+            ";
+        }
+
+        $query .= "
             RETURN t
         ";
 
@@ -164,21 +119,32 @@ class TransactionService
      * @param float $amount
      * @param string $description
      * @param int $timestamp
+     * @param array $tags
      *
      * @return mixed
      */
-    public function updateTransactionById(int $userId, int $id, float $amount, string $description, ?int $timestamp)
+    public function updateTransactionById(int $userId, int $id, float $amount, string $description, ?int $timestamp, array $tags = [])
     {
         $query = "
             MATCH (u:User {sqlId: {uid}})
             MATCH (u)-[:HAS_TRANSACTION]->(t:Transaction)
             WHERE ID(t) = {id}
             SET t.amount = {amount}
+            SET t.description = {description}
         ";
 
         if ($timestamp) {
             $query .= "
                 SET t.timestamp = $timestamp
+            ";
+        }
+
+        foreach ($tags as $k => $tag) {
+            $tag = trim($tag);
+
+            $query .= "
+                MERGE (u)-[:HAS_TAG]->(t$k:Tag {name: '$tag'})
+                MERGE (t)-[:TAGGED_AS]->(t$k)
             ";
         }
 
@@ -238,5 +204,87 @@ class TransactionService
             ->setParameter('id', $id)
             ->addEntityMapping('t', Transaction::class)
             ->execute();
+    }
+
+    /**
+     * @param Transaction $transaction
+     * @param string $fragment
+     *
+     * @return bool
+     */
+    private function isTransactionMatchFilter(Transaction $transaction, string $fragment): bool
+    {
+        $res = true;
+
+        /* Handle negation */
+        if ($fragment[0] == '!') {
+            $res = false;
+            $fragment = substr($fragment, 1);
+        }
+
+        /* Amount comparison */
+        if (is_numeric($fragment) && $transaction->getAmount() == (float)$fragment) {
+            return $res;
+        }
+
+        if ($fragment[0] === '=' && $transaction->getAmount() == (float)substr($fragment, 1)) {
+            return $res;
+        }
+
+        if ($fragment[0] === '>') {
+            $amount = substr($fragment, 1);
+
+            if (is_numeric($amount) && $transaction->getAmount() > (float)$amount) {
+                return $res;
+            }
+        }
+
+        if ($fragment[0] === '<') {
+            $amount = substr($fragment, 1);
+
+            if (is_numeric($amount) && $transaction->getAmount() < (float)$amount) {
+                return $res;
+            }
+        }
+
+        /* Check if description contains the word */
+        if (strpos($transaction->getDescription(), $fragment) !== false) {
+            return $res;
+        }
+
+        /* Check if date cointains the word */
+        $dateFilterString = strtolower(date(self::DATE_SEARCH_FORMAT, $transaction->getTimestamp()));
+
+        if (strpos($dateFilterString, strtolower($fragment)) !== false) {
+            return $res;
+        }
+
+        if (strlen($fragment) <= 1) {
+            return !$res;
+        }
+
+        $twoCharOperator = $fragment[0] . $fragment[1];
+
+        if ($twoCharOperator === '>=') {
+            $amount = substr($fragment, 2);
+
+            if (is_numeric($amount) && $transaction->getAmount() >= (float)$amount) {
+                return $res;
+            }
+        }
+
+        if ($twoCharOperator === '<=') {
+            $amount = substr($fragment, 2);
+
+            if (is_numeric($amount) && $transaction->getAmount() <= (float)$amount) {
+                return $res;
+            }
+        }
+
+        if ($fragment[0] === '<' && $transaction->getAmount() < (float)substr($fragment, 1)) {
+            return $res;
+        }
+
+        return !$res;
     }
 }

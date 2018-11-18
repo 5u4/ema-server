@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Services;
-
+use Illuminate\Support\Facades\DB;
 use App\Models\Sql\User;
 use App\Models\Neo\User as NeoUser;
 use GraphAware\Neo4j\OGM\EntityManager;
@@ -83,6 +83,17 @@ class UserService
 
         return $user;
 
+    }
+
+    public function searchUser($input){
+
+
+        $users = DB::table('users')
+            ->where('username', $input)
+            ->orWhere('id', $input)
+            ->orWhere('email', $input)
+            ->get();
+        return $users;
     }
 
 }

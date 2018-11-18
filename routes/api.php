@@ -44,6 +44,7 @@ Route::group(['prefix' => 'v1'], function () {
     /* User */
     Route::group(['prefix' => 'user', 'middleware' => 'auth'], function () {
         Route::get('/', 'UserController@index');
+        Route::get('/{input}','UserController@search');
     });
 
     /* Avatar */
