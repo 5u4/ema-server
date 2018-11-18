@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\Neo\Tag;
+use App\Models\Neo\Moive;
 use GraphAware\Neo4j\OGM\EntityManager;
 
 /**
@@ -37,7 +37,7 @@ class MovieService
         ";
         return $this->entityManager->createQuery($query)
             ->setParameter('id', $userId)
-            ->addEntityMapping('m', Tag::class)
+            ->addEntityMapping('m', Movie::class)
             ->getResult();
     }
 
@@ -47,7 +47,7 @@ class MovieService
      *
      * @return mixed
      */
-    public function getUserTag(int $userId, int $movieId)
+    public function getUserMovie(int $userId, int $movieId)
     {
         $query = "
             MATCH (u:User {sqlId: {uid}})
@@ -128,8 +128,4 @@ class MovieService
             ->setParameter('id', $movieId)
             ->execute();
     }
-
-
-
-
 }
