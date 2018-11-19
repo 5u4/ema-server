@@ -40,6 +40,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @property string|null $avatar_name
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sql\User whereAvatarName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sql\User whereAvatarPath($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sql\User newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sql\User newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sql\User query()
  */
 class User extends Authenticatable
 {
