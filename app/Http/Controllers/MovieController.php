@@ -46,7 +46,7 @@ class MovieController extends Controller
      */
     public function store(CreateMovieRequest $request): JsonResponse
     {
-        $movie = $this->movieService->createMovie(Auth::id(), $request->name, $request->movieId);
+        $movie = $this->movieService->createMovie(Auth::id(), $request->name, $request->movieId, $request->posterURL);
 
         return MovieResource::make($movie)->response()->setStatusCode(Response::HTTP_CREATED);
     }
