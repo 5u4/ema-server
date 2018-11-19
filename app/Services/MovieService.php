@@ -67,14 +67,15 @@ class MovieService
      * @param int $userId
      * @param string $name
      * @param int $movieId
+     * @param string $posterURL
      *
      * @return mixed
      */
-    public function createMovie(int $userId, string $name, int $movieId)
+    public function createMovie(int $userId, string $name, int $movieId, string $posterURL)
     {
         $query = "
             MERGE (u:User {sqlId: {id}})
-            MERGE (u)-[:WATCH_MOVIE]->(m:Movie {name: {name}, movieId: {movieId}})
+            MERGE (u)-[:WATCH_MOVIE]->(m:Movie {name: {name}, movieId: {movieId}, posterURL: {posterURL}})
             RETURN m
         ";
 
@@ -82,6 +83,7 @@ class MovieService
             ->setParameter('id', $userId)
             ->setParameter('name', $name)
             ->setParameter('movieId', $movieId)
+            ->setParameter('posterURL', $posterURL)
             ->addEntityMapping('m', Movie::class)
             ->getOneResult();
     }

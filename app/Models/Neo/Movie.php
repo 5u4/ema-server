@@ -31,6 +31,12 @@ class Movie
     protected $name;
 
     /**
+     * @OGM\Property(type="string")
+     * @var string
+     */
+    protected $posterURL;
+
+    /**
      * @OGM\Relationship(type="WATCH_MOVIE", direction="INCOMING", collection=true, mappedBy="movies", targetEntity="User")
      * @var User[]|Collection
      */
@@ -82,6 +88,22 @@ class Movie
     public function setMovieName($name)
     {
         $this->name = $name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPosterURL(): string
+    {
+        return $this->posterURL;
+    }
+
+    /**
+     * @param string $posterURL
+     */
+    public function setPosterURL($posterURL)
+    {
+        $this->name = $posterURL;
     }
 
     /**

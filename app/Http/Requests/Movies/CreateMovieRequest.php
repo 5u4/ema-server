@@ -25,7 +25,8 @@ class CreateMovieRequest extends FormRequest
     {
         return [
             'name' => 'required|string|between:1,18',
-            'movieId' => 'required|integer|',
+            'movieId' => 'required|integer',
+            'posterURL' => 'required|string',
         ];
     }
 
@@ -41,6 +42,7 @@ class CreateMovieRequest extends FormRequest
             'name.between'  => 'The :attribute field should be between :min and :max',
             'movieId.require' => 'The :attribute field is required',
             'movieId.integer' => 'movieId should be a integer',
+            'posterURL' => 'The attribute field is required',
         ];
     }
 }
