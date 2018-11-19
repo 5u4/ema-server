@@ -236,7 +236,7 @@ class UserService
     {
         $query = '
         MATCH  (a:User {sqlId: {id}}), (b:User {sqlId: {fid}}) 
-        RETURN EXISTS( (a)-[:FOLLOW]-(b) ) AS isFollowing
+        RETURN EXISTS( (a)-[:FOLLOW]->(b) ) AS isFollowing
         ';
         $result = $this->entityManager->createQuery($query)
             ->setParameter('id', $id)
