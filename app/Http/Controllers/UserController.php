@@ -93,9 +93,7 @@ class UserController extends Controller
     public function isFollowing(User $user): JsonResponse
     {
         $following = $this->userService->isFollowing(Auth::id(), $user->id);
-       // dd($following);
-
-       // return UserResource::make($following)->response();
+      
         return response()->json($following);
     }
 }
