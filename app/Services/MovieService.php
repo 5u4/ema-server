@@ -52,7 +52,8 @@ class MovieService
     {
         $query = "
             MATCH (u:User {sqlId: {uid}})
-            MATCH (u)-[:WATCH_MOVIE]->(m:Movie) WHERE m.movieId = {id}
+            MATCH (m:Movie {movieId: {id}})
+            MATCH (u)-[:WATCH_MOVIE]->(m)
             RETURN m
         ";
 
@@ -75,7 +76,8 @@ class MovieService
     {
         $query = "
             MERGE (u:User {sqlId: {id}})
-            MERGE (u)-[:WATCH_MOVIE]->(m:Movie {name: {name}, movieId: {movieId}, posterURL: {posterURL}})
+            MERGE (m:Movie {name: {name}, movieId: {movieId}, posterURL: {posterURL}})
+            MERGE (u)-[:WATCH_MOVIE]->(m)
             RETURN m
         ";
 
@@ -122,7 +124,8 @@ class MovieService
     {
         $query = "
             MATCH (u:User {sqlId: {uid}})
-            MATCH (u)-[w:WATCH_MOVIE]->(m:Movie) WHERE m.movieId = {id}
+            MATCH (m:Movie {movieId: {id}})
+            MATCH (u)-[w:WATCH_MOVIE]->(m)
             DELETE w
         ";
 
