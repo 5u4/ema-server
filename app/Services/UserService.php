@@ -225,4 +225,25 @@ class UserService
 
         return $friends;
     }
+
+
+    /**
+     * @param int $id
+     *
+     * @return bool
+     */
+    public function isFollowing(int $id, int $isFollowingId)
+    {
+        $query = '
+        MATCH  (a:User {sqlId: {id}}), (b:User {sqlId: {fid}}) 
+        RETURN EXISTS( (a)-[:FOLLOW]-(b) ) AS isFollowing
+        ';
+        $result = $this->entityManager->createQuery($query)
+            ->setParameter('id', $id)
+            ->setParameter('fid', $isFollowingId)
+            ->getOneResult();
+
+        return $result;
+
+    }
 }
