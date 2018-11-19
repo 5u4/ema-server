@@ -44,7 +44,7 @@ Route::group(['prefix' => 'v1'], function () {
         Route::get('/', 'UserController@index');
         Route::get('/{user}', 'UserController@show');
         Route::get('/friends/suggestions', 'UserController@commonfriends');
-        Route::get('/{input}','UserController@search');
+        Route::get('/search/{input}','UserController@search');
         Route::post('/followings/{user}', 'UserController@follow');
         Route::delete('/followings/{user}', 'UserController@unfollow');
     });

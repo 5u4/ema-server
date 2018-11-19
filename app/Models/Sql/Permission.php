@@ -18,6 +18,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sql\Permission whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sql\Permission whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sql\Permission newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sql\Permission newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sql\Permission query()
  */
 class Permission extends Model
 {
