@@ -46,7 +46,9 @@ class TransactionController extends Controller
      */
     public function search(Request $request): JsonResponse
     {
-        $transactions = $this->transactionService->getAllTransactions(Auth::id());
+        $order = $request->order ?? $this->transactionService::DEFAULT_TRANSACTION_SEARCH_ORDER;
+
+        $transactions = $this->transactionService->getAllTransactions(Auth::id(), $order);
 
         $filteredTransactions = $this->transactionService->filterTransactionsWithFragments(
             $transactions, $request->fragment ?? ''
