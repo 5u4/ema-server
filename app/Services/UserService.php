@@ -5,7 +5,6 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Sql\User;
 use App\Models\Neo\User as NeoUser;
 use GraphAware\Neo4j\OGM\EntityManager;
-use phpDocumentor\Reflection\Types\Boolean;
 
 /**
  * Class UserService
