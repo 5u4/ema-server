@@ -459,10 +459,10 @@ class TransactionService
 
         $chart = [];
 
-        foreach ($results as $item => $count) {
+        foreach ($results as $x => $y) {
             $chart[] = [
-                'item'  => $item,
-                'count' => $count,
+                'x' => $x,
+                'y' => $y,
             ];
         }
 
