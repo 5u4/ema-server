@@ -94,6 +94,6 @@ class UserController extends Controller
     {
         $following = $this->userService->isFollowing(Auth::id(), $user->id);
       
-        return response()->json($following);
+        return response()->json(['isFollowing' => $following]);
     }
 }
