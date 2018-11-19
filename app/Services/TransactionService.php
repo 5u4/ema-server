@@ -9,6 +9,8 @@ use GraphAware\Neo4j\OGM\EntityManager;
 
 class TransactionService
 {
+    public const DEFAULT_TRANSACTION_SEARCH_ORDER = 'DESC';
+
     /**
      * Search support for:
      *
@@ -24,15 +26,9 @@ class TransactionService
     private const DATE_SEARCH_FORMAT = 'D l F M Y-m-d a';
 
     private const TRANSACTION_SEARCH_DELIMITER = " ";
-
-    public const DEFAULT_TRANSACTION_SEARCH_ORDER = 'DESC';
-
     private const TRANSACTION_SEARCH_NEGATION_SYMBOL = '!';
-
     private const TRANSACTION_SEARCH_TAG_SYMBOL = '#';
-
     private const TRANSACTION_PIE_CHART_UNTAGGED = 'untagged';
-
     private const TRANSACTION_LINE_CHART_DATE_FORMAT = 'Y-m-d';
 
     /** @var EntityManager $entityManager */
@@ -116,82 +112,16 @@ class TransactionService
             }
         }
 
+        // TODO: These generate function are super inefficient, if time allowed, convert them to one single foreach
+
         return [
             'totalAmount' => number_format($totalAmount, 2, '.', ''),
-            'minExpense' => TransactionResource::make($singleMinExpense),
-            'maxExpense' => TransactionResource::make($singleMaxExpense),
-            'pieChart' => $this->generatePieChart($transactions),
-            'lineChart' => $this->generateLineChart($transactions),
+            'minExpense'  => $singleMinExpense ? TransactionResource::make($singleMinExpense) : null,
+            'maxExpense'  => $singleMaxExpense ? TransactionResource::make($singleMaxExpense) : null,
+            'pieChart'    => $this->generatePieChart($transactions),
+            'lineChart'   => $this->generateLineChart($transactions),
+            'tagCloud'    => $this->generateTagCloud($transactions),
         ];
-    }
-
-    /**
-     * @param array $transactions
-     *
-     * @return array
-     */
-    private function generateLineChart(array $transactions): array
-    {
-        $results = [];
-
-        $xs = [];
-
-        /** @var Transaction $transaction */
-        foreach ($transactions as $transaction) {
-            $x = date(self::TRANSACTION_LINE_CHART_DATE_FORMAT, $transaction->getTimestamp());
-
-            if (isset($xs[$x])) {
-                $xs[$x] += $transaction->getAmount();
-            } else {
-                $xs[$x] = $transaction->getAmount();
-            }
-        }
-
-        foreach ($xs as $x => $y) {
-            $results[] = [
-                'x' => $x,
-                'y' => $y,
-            ];
-        }
-
-        return $results;
-    }
-
-    /**
-     * @param array $transactions
-     *
-     * @return array
-     */
-    private function generatePieChart(array $transactions): array
-    {
-        $results = [self::TRANSACTION_PIE_CHART_UNTAGGED => 0];
-
-
-        /** @var Transaction $transaction */
-        foreach ($transactions as $transaction) {
-            $amount = $transaction->getAmount();
-
-            $tagCount = 0;
-
-            /** @var Tag $tag */
-            foreach ($transaction->getTags() as $tag) {
-                $tagName = $tag->getName();
-
-                if (isset($results[$tagName])) {
-                    $results[$tagName] += $amount;
-                } else {
-                    $results[$tagName] = $amount;
-                }
-
-                $tagCount++;
-            }
-
-            if ($tagCount === 0) {
-                $results[self::TRANSACTION_PIE_CHART_UNTAGGED] += $amount;
-            }
-        }
-
-        return $results;
     }
 
     /**
@@ -459,5 +389,118 @@ class TransactionService
         }
 
         return !$res;
+    }
+
+
+    /**
+     * @param array $transactions
+     *
+     * @return array
+     */
+    private function generateLineChart(array $transactions): array
+    {
+        $results = [];
+
+        $xs = [];
+
+        /** @var Transaction $transaction */
+        foreach ($transactions as $transaction) {
+            $x = date(self::TRANSACTION_LINE_CHART_DATE_FORMAT, $transaction->getTimestamp());
+
+            if (isset($xs[$x])) {
+                $xs[$x] += $transaction->getAmount();
+            } else {
+                $xs[$x] = $transaction->getAmount();
+            }
+        }
+
+        foreach ($xs as $x => $y) {
+            $results[] = [
+                'x' => $x,
+                'y' => $y,
+            ];
+        }
+
+        return $results;
+    }
+
+    /**
+     * @param array $transactions
+     *
+     * @return array
+     */
+    private function generatePieChart(array $transactions): array
+    {
+        $results = [self::TRANSACTION_PIE_CHART_UNTAGGED => 0];
+
+        /** @var Transaction $transaction */
+        foreach ($transactions as $transaction) {
+            $amount = $transaction->getAmount();
+
+            $tagCount = 0;
+
+            /** @var Tag $tag */
+            foreach ($transaction->getTags() as $tag) {
+                $tagName = $tag->getName();
+
+                if (isset($results[$tagName])) {
+                    $results[$tagName] += $amount;
+                } else {
+                    $results[$tagName] = $amount;
+                }
+
+                $tagCount++;
+            }
+
+            if ($tagCount === 0) {
+                $results[self::TRANSACTION_PIE_CHART_UNTAGGED] += $amount;
+            }
+        }
+
+        $chart = [];
+
+        foreach ($results as $item => $count) {
+            $chart[] = [
+                'item'  => $item,
+                'count' => $count,
+            ];
+        }
+
+        return $chart;
+    }
+
+    /**
+     * @param array $transactions
+     *
+     * @return array
+     */
+    private function generateTagCloud(array $transactions): array
+    {
+        $tags = [];
+
+        /** @var Transaction $transaction */
+        foreach ($transactions as $transaction) {
+            /** @var Tag $tag */
+            foreach ($transaction->getTags() as $tag) {
+                $tagName = $tag->getName();
+
+                if (isset($tags[$tagName])) {
+                    $tags[$tagName] += 1;
+                } else {
+                    $tags[$tagName] = 1;
+                }
+            }
+        }
+
+        $results = [];
+
+        foreach ($tags as $name => $value) {
+            $results[] = [
+                'name'  => $name,
+                'value' => $value,
+            ];
+        }
+
+        return $results;
     }
 }
