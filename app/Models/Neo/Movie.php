@@ -31,7 +31,7 @@ class Movie
     protected $name;
 
     /**
-     * @OGM\Relationship(relationshipEntity="WatchMovie", type="WATCH_MOVIE", direction="INCOMING", collection=true, mappedBy="movie")
+     * @OGM\Relationship(type="WATCH_MOVIE", direction="INCOMING", collection=true, mappedBy="movies", targetEntity="User")
      * @var User[]|Collection
      */
     protected $users;

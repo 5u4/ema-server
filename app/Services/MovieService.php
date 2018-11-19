@@ -2,7 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\Neo\Moive;
+use App\Models\Neo\Movie;
+use App\Models\Neo\WatchMovie;
 use GraphAware\Neo4j\OGM\EntityManager;
 
 /**
