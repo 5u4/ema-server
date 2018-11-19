@@ -59,4 +59,10 @@ Route::group(['prefix' => 'v1'], function () {
     Route::group(['prefix' => 'dining', 'middleware' => 'auth'], function () {
         Route::get('/restaurant_search/{input_text}', 'DiningController@index');
     });
+
+    /* Movie */
+    Route::group(['prefix' => 'movies', 'middleware' => 'auth'], function(){
+        Route::get('/', 'MovieController@index');
+        Route::post('/','MovieController@store');
+    });
 });
