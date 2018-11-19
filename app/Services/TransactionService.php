@@ -25,11 +25,15 @@ class TransactionService
 
     private const TRANSACTION_SEARCH_DELIMITER = " ";
 
+    public const DEFAULT_TRANSACTION_SEARCH_ORDER = 'DESC';
+
     private const TRANSACTION_SEARCH_NEGATION_SYMBOL = '!';
 
     private const TRANSACTION_SEARCH_TAG_SYMBOL = '#';
 
     private const TRANSACTION_PIE_CHART_UNTAGGED = 'untagged';
+
+    private const TRANSACTION_LINE_CHART_DATE_FORMAT = 'Y-m-d';
 
     /** @var EntityManager $entityManager */
     private $entityManager;
@@ -47,14 +51,16 @@ class TransactionService
     /**
      * @param int $userId
      *
+     * @param string $order
+     *
      * @return array|mixed
      */
-    public function getAllTransactions(int $userId)
+    public function getAllTransactions(int $userId, string $order = self::DEFAULT_TRANSACTION_SEARCH_ORDER)
     {
         $query = "
             MATCH (:User {sqlId: {sqlId}})-[:HAS_TRANSACTION]->(t:Transaction)
             RETURN DISTINCT t
-            ORDER BY t.timestamp DESC
+            ORDER BY t.timestamp $order
         ";
 
         return $this->entityManager->createQuery($query)
@@ -115,7 +121,40 @@ class TransactionService
             'minExpense' => TransactionResource::make($singleMinExpense),
             'maxExpense' => TransactionResource::make($singleMaxExpense),
             'pieChart' => $this->generatePieChart($transactions),
+            'lineChart' => $this->generateLineChart($transactions),
         ];
+    }
+
+    /**
+     * @param array $transactions
+     *
+     * @return array
+     */
+    private function generateLineChart(array $transactions): array
+    {
+        $results = [];
+
+        $xs = [];
+
+        /** @var Transaction $transaction */
+        foreach ($transactions as $transaction) {
+            $x = date(self::TRANSACTION_LINE_CHART_DATE_FORMAT, $transaction->getTimestamp());
+
+            if (isset($xs[$x])) {
+                $xs[$x] += $transaction->getAmount();
+            } else {
+                $xs[$x] = $transaction->getAmount();
+            }
+        }
+
+        foreach ($xs as $x => $y) {
+            $results[] = [
+                'x' => $x,
+                'y' => $y,
+            ];
+        }
+
+        return $results;
     }
 
     /**
