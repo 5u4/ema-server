@@ -52,7 +52,7 @@ class MovieService
     {
         $query = "
             MATCH (u:User {sqlId: {uid}})
-            MATCH (u)-[:WATCH_MOVIE]->(m:Movie) WHERE ID(m) = {id}
+            MATCH (u)-[:WATCH_MOVIE]->(m:Movie) WHERE m.movieId = {id}
             RETURN m
         ";
 
@@ -122,8 +122,8 @@ class MovieService
     {
         $query = "
             MATCH (u:User {sqlId: {uid}})
-            MATCH (u)-[:WATCH_MOVIE]->(m:Movie) WHERE ID(m) = {id}
-            DETACH DELETE m
+            MATCH (u)-[w:WATCH_MOVIE]->(m:Movie) WHERE m.movieId = {id}
+            DELETE w
         ";
 
         $this->entityManager->createQuery($query)

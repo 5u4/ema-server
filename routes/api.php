@@ -60,5 +60,6 @@ Route::group(['prefix' => 'v1'], function () {
     Route::group(['prefix' => 'movies', 'middleware' => 'auth'], function(){
         Route::get('/', 'MovieController@index');
         Route::post('/','MovieController@store');
+        Route::delete('/{movieId}','MovieController@destory');
     });
 });
