@@ -23,7 +23,7 @@ class DiningService
      */
     public function getRestaurantList(String $input)
     {
-        $url = 'https://api.yelp.com/v3/businesses/search?term=restaurants&location='.$input.'&limit=50';
+        $url = 'https://api.yelp.com/v3/businesses/search?term=restaurants&location='.$input.'&limit=50&open_now=&attributes=';
         $requestContent = [
             'headers' => [
                 'Authorization'=> "Bearer EXCKgny_5NI0-DuoD-vpEGcsowVY15hUCH60XlgrzSQaePnXN-ghbw0Cv8spDYmmdqcrFEDpKXKVU6oZSb6mxPWtDZqZbBrTD-hBhhTbKz0JFM-jM2vGwXsLi43WW3Yx"
