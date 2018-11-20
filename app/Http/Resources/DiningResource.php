@@ -22,7 +22,7 @@ class DiningResource extends JsonResource
             'price'        => isset($this['price']) ? $this['price'] : "N/A",
             'city'  =>isset($this['location']['city']) ?$this['location']['city'] : "N/A",
             'address'=> isset($this['location']['address1']) ? $this['location']['address1'] : "N/A",
-            'rating'     =>isset($this['rate']) ? $this['rate'] : "N/A",
+            'rating'     =>isset($this['rating']) ? $this['rating'] : "N/A",
             'phone'     => isset($this['phone']) ? $this['phone'] : "N/A",
             "review_count"=>isset($this['review_count']) ? $this['review_count'] : "N/A",
 
