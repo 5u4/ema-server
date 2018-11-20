@@ -87,15 +87,18 @@ class UserService
 
     }
 
-    public function searchUser($input){
+    /**
+     * @param string $input
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function searchUser(string $input)
+    {
+        $searchString = '%' . $input . '%';
 
-
-        $users = DB::table('users')
-            ->where('username', $input)
-            ->orWhere('id', $input)
-            ->orWhere('email', $input)
+        return User::where('username', 'like', $searchString)
+            ->orWhere('email', 'like', $searchString)
             ->get();
-        return $users;
     }
 
     /**

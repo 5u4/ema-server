@@ -57,9 +57,9 @@ class UserController extends Controller
      */
     public function search(string $input):JsonResponse
     {
-        $userList = $this->userService->searchUser($input);
+        $users = $this->userService->searchUser($input);
 
-        return UserResource::collection(collect($userList))->response();
+        return UserResource::collection($users)->response();
     }
 
     /**
