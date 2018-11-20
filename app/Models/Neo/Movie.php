@@ -10,7 +10,6 @@ use GraphAware\Neo4j\OGM\Common\Collection;
  *
  * @OGM\Node (label="Movie")
  */
-
 class Movie
 {
     /**
@@ -29,21 +28,26 @@ class Movie
      * @OGM\Property(type="string")
      * @var string
      */
-    protected $movieName;
+    protected $name;
 
     /**
-     * @var Collection
-     *
-     * @OGM\Relationship(relationshipEntity="WatchMovie", type="WATCH_MOVIE", direction="INCOMING", collection=true, mappedBy="movie")
+     * @OGM\Property(type="string")
+     * @var string
      */
-    protected $watchMovie;
+    protected $posterURL;
+
+    /**
+     * @OGM\Relationship(type="WATCH_MOVIE", direction="INCOMING", collection=true, mappedBy="movies", targetEntity="User")
+     * @var User[]|Collection
+     */
+    protected $users;
 
     /**
      * Movie constructor.
      */
     public function __construct()
     {
-        $this->watchMovie = new Collection();
+        $this->users = new Collection();
     }
 
     /**
@@ -65,7 +69,7 @@ class Movie
     /**
      * @param int $movieId
      */
-    public function setAmount($movieId)
+    public function setMovieId($movieId)
     {
         $this->movieId = $movieId;
     }
@@ -75,30 +79,39 @@ class Movie
      */
     public function getMovieName(): string
     {
-        return $this->movieName;
+        return $this->name;
     }
 
     /**
-     * @param string $movieName
+     * @param string $name
      */
-    public function setMovieName($movieName)
+    public function setMovieName($name)
     {
-        $this->movieName = $movieName;
+        $this->name = $name;
     }
 
     /**
-     * @return WatchMovie
+     * @return string
      */
-    public function getHasTransaction(): WatchMovie
+    public function getPosterURL(): string
     {
-        return $this->watchMovie;
+        return $this->posterURL;
     }
 
     /**
-     * @param $watchMovie
+     * @param string $posterURL
      */
-    public function setHasTransaction($watchMovie)
+    public function setPosterURL($posterURL)
     {
-        $this->watchMovie = $watchMovie;
+        $this->name = $posterURL;
     }
+
+    /**
+     * @return User[]|Collection
+     */
+    public function getUsers()
+    {
+        return $this->users;
+    }
+
 }

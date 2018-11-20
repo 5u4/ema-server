@@ -2,11 +2,15 @@
 
 namespace App\Services;
 
+use App\Http\Resources\TransactionResource;
+use App\Models\Neo\Tag;
 use App\Models\Neo\Transaction;
 use GraphAware\Neo4j\OGM\EntityManager;
 
 class TransactionService
 {
+    public const DEFAULT_TRANSACTION_SEARCH_ORDER = 'DESC';
+
     /**
      * Search support for:
      *
@@ -19,9 +23,13 @@ class TransactionService
      * d: 01 to 31
      * a: am or pm
      */
-    private const DATE_SEARCH_FORMAT = 'D l F M Y m d a';
+    private const DATE_SEARCH_FORMAT = 'D l F M Y-m-d a';
 
-    private const TRANSACTION_SEARCH_DELIMITER = ",";
+    private const TRANSACTION_SEARCH_DELIMITER = " ";
+    private const TRANSACTION_SEARCH_NEGATION_SYMBOL = '!';
+    private const TRANSACTION_SEARCH_TAG_SYMBOL = '#';
+    private const TRANSACTION_PIE_CHART_UNTAGGED = 'untagged';
+    private const TRANSACTION_LINE_CHART_DATE_FORMAT = 'Y-m-d';
 
     /** @var EntityManager $entityManager */
     private $entityManager;
@@ -39,14 +47,16 @@ class TransactionService
     /**
      * @param int $userId
      *
+     * @param string $order
+     *
      * @return array|mixed
      */
-    public function getAllTransactions(int $userId)
+    public function getAllTransactions(int $userId, string $order = self::DEFAULT_TRANSACTION_SEARCH_ORDER)
     {
         $query = "
             MATCH (:User {sqlId: {sqlId}})-[:HAS_TRANSACTION]->(t:Transaction)
             RETURN DISTINCT t
-            ORDER BY t.timestamp DESC
+            ORDER BY t.timestamp $order
         ";
 
         return $this->entityManager->createQuery($query)
@@ -72,6 +82,46 @@ class TransactionService
         }
 
         return $transactions;
+    }
+
+    /**
+     * @param array $transactions
+     *
+     * @return array
+     */
+    public function getMetaDataFromGivenTransactions(array $transactions): array
+    {
+        $totalAmount = 0;
+        /** @var Transaction $singleMinExpense */
+        $singleMinExpense = null;
+        /** @var Transaction $singleMaxExpense */
+        $singleMaxExpense = null;
+
+        /** @var Transaction $transaction */
+        foreach ($transactions as $transaction) {
+            $transactionAmount = $transaction->getAmount();
+
+            $totalAmount += $transactionAmount;
+
+            if ($singleMinExpense === null || $transactionAmount < $singleMinExpense->getAmount()) {
+                $singleMinExpense = $transaction;
+            }
+
+            if ($singleMaxExpense === null || $transactionAmount > $singleMinExpense->getAmount()) {
+                $singleMaxExpense = $transaction;
+            }
+        }
+
+        // TODO: These generate function are super inefficient, if time allowed, convert them to one single foreach
+
+        return [
+            'totalAmount' => number_format($totalAmount, 2, '.', ''),
+            'minExpense'  => $singleMinExpense ? TransactionResource::make($singleMinExpense) : null,
+            'maxExpense'  => $singleMaxExpense ? TransactionResource::make($singleMaxExpense) : null,
+            'pieChart'    => $this->generatePieChart($transactions),
+            'lineChart'   => $this->generateLineChart($transactions),
+            'tagCloud'    => $this->generateTagCloud($transactions),
+        ];
     }
 
     /**
@@ -214,12 +264,22 @@ class TransactionService
      */
     private function isTransactionMatchFilter(Transaction $transaction, string $fragment): bool
     {
+        if ($fragment === '') {
+            return true;
+        }
+
+        $fragment = strtolower($fragment);
+
         $res = true;
 
         /* Handle negation */
-        if ($fragment[0] == '!') {
+        if ($fragment[0] == self::TRANSACTION_SEARCH_NEGATION_SYMBOL) {
             $res = false;
             $fragment = substr($fragment, 1);
+        }
+
+        if ($fragment === '') {
+            return $res;
         }
 
         /* Amount comparison */
@@ -237,6 +297,12 @@ class TransactionService
             if (is_numeric($amount) && $transaction->getAmount() > (float)$amount) {
                 return $res;
             }
+
+            $fragTime = strtotime($amount);
+
+            if ($fragTime !== false && $transaction->getTimestamp() > $fragTime) {
+                return $res;
+            }
         }
 
         if ($fragment[0] === '<') {
@@ -245,20 +311,49 @@ class TransactionService
             if (is_numeric($amount) && $transaction->getAmount() < (float)$amount) {
                 return $res;
             }
+
+            $fragTime = strtotime($amount);
+
+            if ($fragTime !== false && $transaction->getTimestamp() < $fragTime) {
+                return $res;
+            }
         }
 
         /* Check if description contains the word */
-        if (strpos($transaction->getDescription(), $fragment) !== false) {
+        if (strpos(strtolower($transaction->getDescription()), $fragment) !== false) {
             return $res;
         }
 
         /* Check if date cointains the word */
         $dateFilterString = strtolower(date(self::DATE_SEARCH_FORMAT, $transaction->getTimestamp()));
 
-        if (strpos($dateFilterString, strtolower($fragment)) !== false) {
+        if (strpos($dateFilterString, $fragment) !== false) {
             return $res;
         }
 
+        /* Check tags */
+        if ($fragment[0] === self::TRANSACTION_SEARCH_TAG_SYMBOL) {
+            $fragment = substr($fragment, 1);
+
+            $tagString = '';
+
+            /** @var Tag $tag */
+            foreach ($transaction->getTags() as $tag) {
+                $tagString .= $tag->getName();
+            }
+
+            if ($fragment === '') {
+                return $fragment === $tagString ? !$res : $res;
+            }
+
+            if (strpos(strtolower($tagString), $fragment) !== false) {
+                return $res;
+            }
+
+            return !$res;
+        }
+
+        /* Check two chars comparison operator */
         if (strlen($fragment) <= 1) {
             return !$res;
         }
@@ -271,6 +366,12 @@ class TransactionService
             if (is_numeric($amount) && $transaction->getAmount() >= (float)$amount) {
                 return $res;
             }
+
+            $fragTime = strtotime($amount);
+
+            if ($fragTime !== false && $transaction->getTimestamp() >= $fragTime) {
+                return $res;
+            }
         }
 
         if ($twoCharOperator === '<=') {
@@ -279,12 +380,127 @@ class TransactionService
             if (is_numeric($amount) && $transaction->getAmount() <= (float)$amount) {
                 return $res;
             }
-        }
 
-        if ($fragment[0] === '<' && $transaction->getAmount() < (float)substr($fragment, 1)) {
-            return $res;
+            $fragTime = strtotime($amount);
+
+            if ($fragTime !== false && $transaction->getTimestamp() <= $fragTime) {
+                return $res;
+            }
         }
 
         return !$res;
+    }
+
+
+    /**
+     * @param array $transactions
+     *
+     * @return array
+     */
+    private function generateLineChart(array $transactions): array
+    {
+        $results = [];
+
+        $xs = [];
+
+        /** @var Transaction $transaction */
+        foreach ($transactions as $transaction) {
+            $x = date(self::TRANSACTION_LINE_CHART_DATE_FORMAT, $transaction->getTimestamp());
+
+            if (isset($xs[$x])) {
+                $xs[$x] += $transaction->getAmount();
+            } else {
+                $xs[$x] = $transaction->getAmount();
+            }
+        }
+
+        foreach ($xs as $x => $y) {
+            $results[] = [
+                'x' => $x,
+                'y' => $y,
+            ];
+        }
+
+        return $results;
+    }
+
+    /**
+     * @param array $transactions
+     *
+     * @return array
+     */
+    private function generatePieChart(array $transactions): array
+    {
+        $results = [self::TRANSACTION_PIE_CHART_UNTAGGED => 0];
+
+        /** @var Transaction $transaction */
+        foreach ($transactions as $transaction) {
+            $amount = $transaction->getAmount();
+
+            $tagCount = 0;
+
+            /** @var Tag $tag */
+            foreach ($transaction->getTags() as $tag) {
+                $tagName = $tag->getName();
+
+                if (isset($results[$tagName])) {
+                    $results[$tagName] += $amount;
+                } else {
+                    $results[$tagName] = $amount;
+                }
+
+                $tagCount++;
+            }
+
+            if ($tagCount === 0) {
+                $results[self::TRANSACTION_PIE_CHART_UNTAGGED] += $amount;
+            }
+        }
+
+        $chart = [];
+
+        foreach ($results as $x => $y) {
+            $chart[] = [
+                'x' => $x,
+                'y' => $y,
+            ];
+        }
+
+        return $chart;
+    }
+
+    /**
+     * @param array $transactions
+     *
+     * @return array
+     */
+    private function generateTagCloud(array $transactions): array
+    {
+        $tags = [self::TRANSACTION_PIE_CHART_UNTAGGED => 0];
+
+        /** @var Transaction $transaction */
+        foreach ($transactions as $transaction) {
+            /** @var Tag $tag */
+            foreach ($transaction->getTags() as $tag) {
+                $tagName = $tag->getName();
+
+                if (isset($tags[$tagName])) {
+                    $tags[$tagName] += 1;
+                } else {
+                    $tags[$tagName] = 1;
+                }
+            }
+        }
+
+        $results = [];
+
+        foreach ($tags as $name => $value) {
+            $results[] = [
+                'name'  => $name,
+                'value' => $value,
+            ];
+        }
+
+        return $results;
     }
 }

@@ -40,6 +40,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @property string|null $avatar_name
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sql\User whereAvatarName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sql\User whereAvatarPath($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sql\User newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sql\User newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sql\User query()
  */
 class User extends Authenticatable
 {
@@ -69,5 +72,29 @@ class User extends Authenticatable
     public function permissions(): BelongsToMany
     {
         return $this->belongsToMany(Permission::class, 'user_permissions', 'user_id', 'permission_id');
+    }
+
+    /**
+     * @return bool
+     */
+    public function canViewUsers(): bool
+    {
+        return $this->permissions->contains('name', Permission::READ_USER_PERMISSION);
+    }
+
+    /**
+     * @return bool
+     */
+    public function canDisableUsers(): bool
+    {
+        return $this->permissions->contains('name', Permission::DISABLE_USER_PERMISSION);
+    }
+
+    /**
+     * @return bool
+     */
+    public function canUpdateUserPermissions(): bool
+    {
+        return $this->permissions->contains('name', Permission::UPDATE_PERMISSION_PERMISSION);
     }
 }

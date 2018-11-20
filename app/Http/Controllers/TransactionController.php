@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use App\Services\TransactionService;
 use App\Http\Resources\TransactionResource;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\Expense\CreateTransactionRequest;
@@ -39,19 +40,25 @@ class TransactionController extends Controller
     }
 
     /**
-     * @param string $fragmentString
+     * @param Request $request
      *
      * @return JsonResponse
      */
-    public function search(string $fragmentString): JsonResponse
+    public function search(Request $request): JsonResponse
     {
-        $transactions = $this->transactionService->getAllTransactions(Auth::id());
+        $order = $request->order ?? $this->transactionService::DEFAULT_TRANSACTION_SEARCH_ORDER;
+
+        $transactions = $this->transactionService->getAllTransactions(Auth::id(), $order);
 
         $filteredTransactions = $this->transactionService->filterTransactionsWithFragments(
-            $transactions, $fragmentString
+            $transactions, $request->fragment ?? ''
         );
 
-        return TransactionResource::collection(collect($filteredTransactions))->response();
+        $metaData = $request->withMeta
+            ? $this->transactionService->getMetaDataFromGivenTransactions($filteredTransactions)
+            : null;
+
+        return TransactionResource::collection(collect($filteredTransactions))->additional(['meta' => $metaData])->response();
     }
 
     /**

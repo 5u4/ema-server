@@ -2,9 +2,10 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Sql\Permission;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class MovieResource extends JsonResource
+class PermissionResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,10 +15,12 @@ class MovieResource extends JsonResource
      */
     public function toArray($request)
     {
-        return Array(
-            "id" => $this->getMovieId(),
-            "name" => $this->getMovieName(),
-            "posterURL" => $this->getPosterURL(),
-        );
+        /** @var Permission $this */
+
+        return [
+            'id'          => $this->id,
+            'name'        => $this->name,
+            'description' => $this->description,
+        ];
     }
 }
