@@ -24,7 +24,7 @@ class DiningService
     public function getRestaurantList(String $input)
     {
         $oInput = json_decode($input);
-        $url = 'https://api.yelp.com/v3/businesses/search?term=restaurants&location=' . $oInput->location;
+        $url = 'https://api.yelp.com/v3/businesses/search?term=restaurants&limit=50&location=' . $oInput->location;
         if(array_key_exists('price', $oInput) && $oInput->price !== "") {
             $url .= "&price=" . $oInput->price;
         }
