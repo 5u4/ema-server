@@ -89,16 +89,22 @@ class UserService
 
     /**
      * @param string $input
+     * @param bool $withTrashed
      *
      * @return \Illuminate\Support\Collection
      */
-    public function searchUser(string $input)
+    public function searchUser(string $input, bool $withTrashed = false)
     {
         $searchString = '%' . $input . '%';
 
-        return User::where('username', 'like', $searchString)
-            ->orWhere('email', 'like', $searchString)
-            ->get();
+        $users = User::where('username', 'like', $searchString)
+            ->orWhere('email', 'like', $searchString);
+
+        if ($withTrashed) {
+            $users = $users->withTrashed();
+        }
+
+        return $users->get();
     }
 
     /**
