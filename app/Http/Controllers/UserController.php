@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Users\UpdateUserPermissionRequest;
+use App\Http\Requests\Users\UpdateUserRequest;
 use App\Http\Resources\PermissionResource;
 use App\Http\Resources\UserResource;
 use App\Models\Sql\User;
@@ -72,6 +73,19 @@ class UserController extends Controller
         return UserResource::collection(collect($users))->response();
     }
 
+    /**
+     * @param UpdateUserRequest $request
+     *
+     * @return JsonResponse
+     */
+    public function update(UpdateUserRequest $request): JsonResponse
+    {
+        $user = Auth::user();
+
+        $user->update($request->all());
+
+        return UserResource::make($user)->response();
+    }
 
     /**
      * @return JsonResponse
