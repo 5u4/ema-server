@@ -476,7 +476,7 @@ class TransactionService
      */
     private function generateTagCloud(array $transactions): array
     {
-        $tags = [];
+        $tags = [self::TRANSACTION_PIE_CHART_UNTAGGED => 0];
 
         /** @var Transaction $transaction */
         foreach ($transactions as $transaction) {

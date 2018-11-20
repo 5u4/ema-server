@@ -73,4 +73,28 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Permission::class, 'user_permissions', 'user_id', 'permission_id');
     }
+
+    /**
+     * @return bool
+     */
+    public function canViewUsers(): bool
+    {
+        return $this->permissions->contains('name', Permission::READ_USER_PERMISSION);
+    }
+
+    /**
+     * @return bool
+     */
+    public function canDisableUsers(): bool
+    {
+        return $this->permissions->contains('name', Permission::DISABLE_USER_PERMISSION);
+    }
+
+    /**
+     * @return bool
+     */
+    public function canUpdateUserPermissions(): bool
+    {
+        return $this->permissions->contains('name', Permission::UPDATE_PERMISSION_PERMISSION);
+    }
 }
