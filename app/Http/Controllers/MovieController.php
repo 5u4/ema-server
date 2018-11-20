@@ -67,8 +67,4 @@ class MovieController extends Controller
 
         return MovieResource::make($movie)->response();
     }
-
-
-
-
 }

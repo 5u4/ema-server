@@ -62,4 +62,11 @@ Route::group(['prefix' => 'v1'], function () {
         Route::post('/','MovieController@store');
         Route::delete('/{movieId}','MovieController@destroy');
     });
+
+    /* Review */
+    Route::group(['prefix' => 'review', 'middleware' => 'auth'], function(){
+        Route::get('/{movieId}', 'ReviewController@index');
+        Route::post('/','ReviewController@store');
+        Route::delete('/{reviewId}','ReviewController@destroy');
+    });
 });
