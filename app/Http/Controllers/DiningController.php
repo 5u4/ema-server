@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Services\DiningService;
 use App\Http\Resources\DiningResource;
 use Illuminate\Support\Facades\Auth;
+use phpDocumentor\Reflection\Types\Array_;
 
 /**
  * Class DiningController
