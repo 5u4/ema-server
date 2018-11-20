@@ -8,6 +8,7 @@ use App\Http\Resources\UserResource;
 use App\Models\Sql\User;
 use Illuminate\Http\JsonResponse;
 use App\Services\UserService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -51,13 +52,16 @@ class UserController extends Controller
     }
 
     /**
-     * @param string $input
+     * @param Request $request
      *
      * @return JsonResponse
      */
-    public function search(string $input):JsonResponse
+    public function search(Request $request):JsonResponse
     {
-        $users = $this->userService->searchUser($input);
+        $input = $request->get('input') ?? '';
+        $withTrashed = $request->get('withTrashed') ?? false;
+
+        $users = $this->userService->searchUser($input, $withTrashed);
 
         return UserResource::collection($users)->response();
     }
