@@ -21,24 +21,27 @@ class DiningService
      * @return mixed
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function getRestaurantList(String $input)
+    public function search(string $location, string $price,string $categories,string $sortby,string $attributes,string $open_now)
     {
-        $oInput = json_decode($input);
-        $url = 'https://api.yelp.com/v3/businesses/search?term=restaurants&limit=50&location=' . $oInput->location;
-        if(array_key_exists('price', $oInput) && $oInput->price !== "") {
-            $url .= "&price=" . $oInput->price;
+
+        $url = 'https://api.yelp.com/v3/businesses/search?term=restaurants&limit=50' ;
+        if($location!==""){
+            $url .= "&location=" . $location;
         }
-        if(array_key_exists('categories', $oInput) && $oInput->categories !== "") {
-            $url .= "&categories=" . $oInput->categories;
+        if($price!=="") {
+            $url .= "&price=" . $price;
         }
-        if(array_key_exists('sort_by', $oInput) && $oInput->sort_by !== "") {
-            $url .= "&sort_by=" . $oInput->sort_by;
+        if($categories !== "") {
+            $url .= "&categories=" . $categories;
         }
-        if(array_key_exists('attributes', $oInput) && $oInput->attributes !== "") {
-            $url .= "&attributes=" . $oInput->attributes;
+        if($sortby !== "") {
+            $url .= "&sort_by=" . $sortby;
         }
-        if(array_key_exists('open_now', $oInput) && $oInput->open_now !== "") {
-            $url .= "&open_now=" . $oInput->open_now;
+        if($attributes !== "") {
+            $url .= "&attributes=" . $attributes;
+        }
+        if($open_now !== "") {
+            $url .= "&open_now=" . $open_now;
         }
         $requestContent = [
             'headers' => [

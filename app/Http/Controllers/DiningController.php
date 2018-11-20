@@ -22,13 +22,26 @@ class DiningController extends Controller
     }
 
     /**
-     * @param String $input
+     * @param Request $request
      * @return JsonResponse
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function index(String $input): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $restaurantList = $this->diningService->getRestaurantList($input);
-        return DiningResource::collection(collect($restaurantList))->response();
+
+        $location = $request->get('location') ?? '';
+        $price = $request->get('price') ?? '';
+        $categories = $request->get('categories') ?? '';
+        $sortby = $request->get('sortby') ?? '';
+        $attributes = $request->get('attributes') ?? '';
+
+        $open_now = $request->get('open_now') ?? '';
+        $restaurants = $this->diningService->search($location, $price,$categories,$sortby,$attributes,$open_now);
+
+        return DiningResource::collection(collect($restaurants))->response();
+
+
+
     }
 
 }
