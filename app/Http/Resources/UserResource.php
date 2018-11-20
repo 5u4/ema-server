@@ -27,6 +27,7 @@ class UserResource extends JsonResource
             'lastLogin' => $lastLogin,
             'createdAt' => $createdAt,
             'updatedAt' => $updatedAt,
+            'deletedAt' => $this->deleted_at,
         ];
     }
 }

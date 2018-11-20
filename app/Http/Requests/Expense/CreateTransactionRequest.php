@@ -24,7 +24,7 @@ class CreateTransactionRequest extends FormRequest
     public function rules()
     {
         return [
-            'amount' => 'required|numeric',
+            'amount' => 'required|numeric|min:0',
             'description' => 'required|between:1,120',
             'timestamp' => 'integer',
             'tag' => 'string',

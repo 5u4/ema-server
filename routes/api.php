@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -48,6 +46,15 @@ Route::group(['prefix' => 'v1'], function () {
         Route::get('/follows/{user}', 'UserController@isFollowing');
         Route::post('/followings/{user}', 'UserController@follow');
         Route::delete('/followings/{user}', 'UserController@unfollow');
+        Route::put('/{user}/disable', 'UserController@disable');
+        Route::put('/{id}/restore', 'UserController@enable');
+        Route::put('/{user}/permissions', 'UserController@updateUserPermissions');
+    });
+
+    /* Permission */
+    Route::group(['prefix' => 'permissions'], function () {
+        Route::get('/', 'PermissionController@index');
+        Route::get('/{user}', 'PermissionController@show')->middleware('auth');
     });
 
     /* Avatar */

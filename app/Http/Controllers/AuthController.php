@@ -56,7 +56,12 @@ class AuthController extends Controller
 
         $token = $this->authService->getAuthToken();
 
-        return UserResource::make($user)->additional(['token' => $token])->response();
+        $additionalInfo = [
+            'token' => $token,
+            'permissionIds' => $user->permissions->pluck('id'),
+        ];
+
+        return UserResource::make($user)->additional($additionalInfo)->response();
     }
 
     /**
@@ -76,8 +81,11 @@ class AuthController extends Controller
         $user->last_login = Carbon::now();
         $user->save();
 
-        return UserResource::make($user)
-            ->additional(['token' => $this->authService->getAuthToken()])
-            ->response();
+        $additionalInfo = [
+            'token' => $this->authService->getAuthToken(),
+            'permissionIds' => $user->permissions->pluck('id'),
+        ];
+
+        return UserResource::make($user)->additional($additionalInfo)->response();
     }
 }
