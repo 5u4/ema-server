@@ -59,6 +59,17 @@ class UserController extends Controller
         return UserResource::collection(collect($users))->response();
     }
 
+
+    /**
+     * @return JsonResponse
+     */
+    public function friends(): JsonResponse
+    {
+        $users = $this->userService->getFriends(Auth::id());
+
+        return UserResource::collection(collect($users))->response();
+    }
+
     /**
      * @param User $user
      *

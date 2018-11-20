@@ -43,6 +43,7 @@ Route::group(['prefix' => 'v1'], function () {
     Route::group(['prefix' => 'user', 'middleware' => 'auth'], function () {
         Route::get('/', 'UserController@index');
         Route::get('/{user}', 'UserController@show');
+        Route::get("/friends/index", 'UserController@friends');
         Route::get('/friends/suggestions', 'UserController@commonfriends');
         Route::get('/search/{input}','UserController@search');
         Route::get('/follows/{user}', 'UserController@isFollowing');

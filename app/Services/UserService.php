@@ -226,6 +226,32 @@ class UserService
         return $friends;
     }
 
+    /**
+     * @param int $id
+     *
+     * @return array
+     */
+    public function getFriends(int $id): array
+    {
+
+        $query = "
+           MATCH (u:User {sqlId: {id}})-[:FOLLOW]->(friends:User)-[:FOLLOW]->(u)
+            WHERE NOT friends.sqlId = {id}
+            RETURN friends.sqlId AS friendId
+        ";
+
+        $result = $this->entityManager->createQuery($query)
+            ->setParameter('id', $id)
+            ->getResult();
+
+        $friends = [];
+
+        foreach ($result as $friend) {
+            $friends[] = User::find($friend['friendId']);
+        }
+
+        return $friends;
+    }
 
     /**
      * @param int $id
