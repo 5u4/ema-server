@@ -61,4 +61,15 @@ class DiningController extends Controller
         return FavRestaurantResource::make($restaurant)->response()->setStatusCode(Response::HTTP_CREATED);
     }
 
+    public function destroy(string $rest_id): JsonResponse
+    {
+        $userId = Auth::id();
+
+        $restaurant = $this->diningService->getDeleteUserRestaurant($userId, $rest_id);
+
+        $this->diningService->detachDeleteRestaurant($userId, $rest_id);
+
+        return FavRestaurantResource::make($restaurant)->response();
+    }
+
 }

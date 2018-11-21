@@ -64,7 +64,37 @@ class DiningService
             $response = $re->getResponse();
             return $response;
         }
+    }
 
+    public function getDeleteUserRestaurant(int $userId, string $rest_id)
+    {
+        $query = "
+            MATCH (u:User {sqlId: {uid}})
+            MATCH (r:Restaurant {rest_id: {id}})
+            MATCH (u:User)-[:favs]->(r:Restaurant)
+            RETURN r
+        ";
+
+        return $this->entityManager->createQuery($query)
+            ->setParameter('uid', $userId)
+            ->setParameter('id', $rest_id)
+            ->addEntityMapping('r', Restaurant::class)
+            ->getOneResult();
+    }
+
+    public function detachDeleteRestaurant(int $userId, string $rest_id)
+    {
+        $query = "
+            MATCH (u:User {sqlId: {uid}})
+            MATCH (r:Restaurant {rest_id: {id}})
+            MATCH (u)-[f:favs]->(r)
+            DELETE f
+        ";
+
+        $this->entityManager->createQuery($query)
+            ->setParameter('uid', $userId)
+            ->setParameter('id', $rest_id)
+            ->execute();
     }
 
     public function getUserRestaurants(int $userId)

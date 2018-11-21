@@ -77,7 +77,7 @@ Route::group(['prefix' => 'v1'], function () {
         Route::post('/search', 'DiningController@index');
         Route::get('/search', 'DiningController@findFavouriteRestaurants');
         Route::post('/', 'DiningController@addFavouriteRestaurants');
-        //Route::delete('/{restaurantId}', 'DiningController@destroy');
+        Route::delete('/{restaurantId}', 'DiningController@destroy');
     });
 
     /* Movie */
