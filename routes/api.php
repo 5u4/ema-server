@@ -73,8 +73,11 @@ Route::group(['prefix' => 'v1'], function () {
     });
 
     /* Dining */
-    Route::group(['prefix' => 'dining', 'middleware' => 'auth'], function () {
-        Route::get('/restaurant_search/{input_text}', 'DiningController@index');
+    Route::group(['prefix' => 'dining','middleware' => 'auth'], function () {
+        Route::post('/search', 'DiningController@index');
+        Route::get('/search', 'DiningController@findFavouriteRestaurants');
+        Route::post('/', 'DiningController@addFavouriteRestaurants');
+        Route::delete('/{restaurantId}', 'DiningController@destroy');
     });
 
     /* Movie */

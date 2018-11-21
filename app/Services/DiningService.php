@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Services;
+use App\Models\Neo\Restaurant;
 use GuzzleHttp\Client as GuzzleHttpClient;
 use GuzzleHttp\Exception\RequestException;
 use GraphAware\Neo4j\OGM\EntityManager;
@@ -21,24 +22,27 @@ class DiningService
      * @return mixed
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function getRestaurantList(String $input)
+    public function search(string $location, string $price,string $categories,string $sortby,string $attributes,string $open_now)
     {
-        $oInput = json_decode($input);
-        $url = 'https://api.yelp.com/v3/businesses/search?term=restaurants&location=' . $oInput->location;
-        if(array_key_exists('price', $oInput) && $oInput->price !== "") {
-            $url .= "&price=" . $oInput->price;
+
+        $url = 'https://api.yelp.com/v3/businesses/search?term=restaurants&limit=50' ;
+        if($location!==""){
+            $url .= "&location=" . $location;
         }
-        if(array_key_exists('categories', $oInput) && $oInput->categories !== "") {
-            $url .= "&categories=" . $oInput->categories;
+        if($price!=="") {
+            $url .= "&price=" . $price;
         }
-        if(array_key_exists('sort_by', $oInput) && $oInput->sort_by !== "") {
-            $url .= "&sort_by=" . $oInput->sort_by;
+        if($categories !== "") {
+            $url .= "&categories=" . $categories;
         }
-        if(array_key_exists('attributes', $oInput) && $oInput->attributes !== "") {
-            $url .= "&attributes=" . $oInput->attributes;
+        if($sortby !== "") {
+            $url .= "&sort_by=" . $sortby;
         }
-        if(array_key_exists('open_now', $oInput) && $oInput->open_now !== "") {
-            $url .= "&open_now=" . $oInput->open_now;
+        if($attributes !== "") {
+            $url .= "&attributes=" . $attributes;
+        }
+        if($open_now !== "") {
+            $url .= "&open_now=" . $open_now;
         }
         $requestContent = [
             'headers' => [
@@ -60,7 +64,67 @@ class DiningService
             $response = $re->getResponse();
             return $response;
         }
+    }
 
+    public function getDeleteUserRestaurant(int $userId, string $rest_id)
+    {
+        $query = "
+            MATCH (u:User {sqlId: {uid}})
+            MATCH (r:Restaurant {rest_id: {id}})
+            MATCH (u:User)-[:favs]->(r:Restaurant)
+            RETURN r
+        ";
+
+        return $this->entityManager->createQuery($query)
+            ->setParameter('uid', $userId)
+            ->setParameter('id', $rest_id)
+            ->addEntityMapping('r', Restaurant::class)
+            ->getOneResult();
+    }
+
+    public function detachDeleteRestaurant(int $userId, string $rest_id)
+    {
+        $query = "
+            MATCH (u:User {sqlId: {uid}})
+            MATCH (r:Restaurant {rest_id: {id}})
+            MATCH (u)-[f:favs]->(r)
+            DELETE f
+        ";
+
+        $this->entityManager->createQuery($query)
+            ->setParameter('uid', $userId)
+            ->setParameter('id', $rest_id)
+            ->execute();
+    }
+
+    public function getUserRestaurants(int $userId)
+    {
+        $query = "
+            MATCH (u:User {sqlId: {id}})-[:favs]->(r:Restaurant)
+            RETURN DISTINCT r
+        ";
+        return $this->entityManager->createQuery($query)
+            ->setParameter('id', $userId)
+            ->addEntityMapping('r', Restaurant::class)
+            ->getResult();
+    }
+
+    public function createRestaurant(int $userId, string $name, string $rest_id)
+    {
+        $query = "
+            MERGE (u:User {sqlId: {id}})
+            MERGE (r:Restaurant {rest_id: {rest_id}})
+            MERGE (u)-[:favs]->(r)
+            SET r.name = {name}
+            RETURN r
+        ";
+
+        return $this->entityManager->createQuery($query)
+            ->setParameter('id', $userId)
+            ->setParameter('name', $name)
+            ->setParameter('rest_id', $rest_id)
+            ->addEntityMapping('r', Restaurant::class)
+            ->getOneResult();
     }
 
 }
