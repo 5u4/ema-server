@@ -212,6 +212,144 @@ class DemoTest extends TestCase
                 'timestamp'   => 1526841240,
                 'tags'        => 'dinner,wasted',
             ],
+            [
+                'amount'      => 33.59,
+                'description' => 'Winners',
+                'timestamp'   => strtotime('2018-11-18'),
+                'tags'        => 'shopping',
+            ],
+            [
+                'amount'      => 10,
+                'description' => 'sfu parking',
+                'timestamp'   => strtotime('2018-11-16'),
+                'tags'        => 'parking',
+            ],
+            [
+                'amount'      => 11.18,
+                'description' => 'php d\'lite',
+                'timestamp'   => strtotime('2018-11-15'),
+                'tags'        => 'dinner',
+            ],
+            [
+                'amount'      => 60,
+                'description' => 'esso',
+                'timestamp'   => strtotime('2018-11-12'),
+                'tags'        => 'gas',
+            ],
+            [
+                'amount'      => 5,
+                'description' => 'sfu parking',
+                'timestamp'   => strtotime('2018-11-2'),
+                'tags'        => 'parking',
+            ],
+            [
+                'amount'      => 5.2,
+                'description' => 'starbucks',
+                'timestamp'   => strtotime('2018-11-1'),
+                'tags'        => 'drinks',
+            ],
+            [
+                'amount'      => 6.5,
+                'description' => 'sfu parking',
+                'timestamp'   => strtotime('2018-10-27'),
+                'tags'        => 'parking',
+            ],
+            [
+                'amount'      => 67.2,
+                'description' => 'Fido phone',
+                'timestamp'   => strtotime('2018-10-24'),
+                'tags'        => 'cellular',
+            ],
+            [
+                'amount'      => 15.03,
+                'description' => 'pho d\'lite',
+                'timestamp'   => strtotime('2018-10-18'),
+                'tags'        => 'dinner',
+            ],
+            [
+                'amount'      => 112.21,
+                'description' => 'Amazon',
+                'timestamp'   => strtotime('2018-10-17'),
+                'tags'        => 'shopping',
+            ],
+            [
+                'amount'      => 12,
+                'description' => 'easypark',
+                'timestamp'   => strtotime('2018-10-13'),
+                'tags'        => 'parking',
+            ],
+            [
+                'amount'      => 43.68,
+                'description' => 'Amazon prime',
+                'timestamp'   => strtotime('2018-10-09'),
+                'tags'        => 'membership',
+            ],
+            [
+                'amount'      => 37.5,
+                'description' => 'msp',
+                'timestamp'   => strtotime('2018-10-08'),
+                'tags'        => '',
+            ],
+            [
+                'amount'      => 5.46,
+                'description' => 'chatime',
+                'timestamp'   => strtotime('2018-08-26'),
+                'tags'        => 'drinks',
+            ],
+            [
+                'amount'      => 5,
+                'description' => 'badminton',
+                'timestamp'   => strtotime('2018-05-05'),
+                'tags'        => 'sport',
+            ],
+            [
+                'amount'      => 0.7,
+                'description' => 'aws',
+                'timestamp'   => strtotime('2018-03-03'),
+                'tags'        => 'web',
+            ],
+            [
+                'amount'      => 716.75,
+                'description' => 'video card',
+                'timestamp'   => strtotime('2017-12-26'),
+                'tags'        => 'pc',
+            ],
+            [
+                'amount'      => 5,
+                'description' => 'sfu parking',
+                'timestamp'   => strtotime('2017-12-05'),
+                'tags'        => 'parking',
+            ],
+            [
+                'amount'      => 12.99,
+                'description' => 'phone case',
+                'timestamp'   => strtotime('2017-12-09'),
+                'tags'        => 'shopping',
+            ],
+            [
+                'amount'      => 37.48,
+                'description' => 'shell',
+                'timestamp'   => strtotime('2018-12-01'),
+                'tags'        => 'gas',
+            ],
+            [
+                'amount'      => 83.99,
+                'description' => 'wal-mart',
+                'timestamp'   => strtotime('2018-11-27'),
+                'tags'        => 'shopping',
+            ],
+            [
+                'amount'      => 6.5,
+                'description' => 'sfu parking',
+                'timestamp'   => strtotime('2017-10-14'),
+                'tags'        => 'parking',
+            ],
+            [
+                'amount'      => 29,
+                'description' => 'fido overlimit fee',
+                'timestamp'   => strtotime('2017-09-05'),
+                'tags'        => 'cellular,wasted',
+            ],
         ];
     }
 
@@ -229,7 +367,7 @@ class DemoTest extends TestCase
             [
                 'username'   => 'James',
                 'email'      => 'sxa16@sfu.ca',
-                'followings' => ['David', 'Jenny', 'RayH', 'Branton'],
+                'followings' => ['David', 'Jenny', 'RayH', 'Branton', 'keanu'],
             ],
             [
                 'username'   => 'Jenny',
@@ -239,12 +377,42 @@ class DemoTest extends TestCase
             [
                 'username'   => 'RayH',
                 'email'      => 'yuhuih@sfu.ca',
-                'followings' => ['David', 'James', 'Jenny', 'Branton'],
+                'followings' => ['David', 'James', 'Jenny', 'Branton', 'carrie', 'hugo'],
             ],
             [
                 'username'   => 'Branton',
                 'email'      => 'brantonl@sfu.ca',
                 'followings' => ['David', 'James', 'Jenny', 'RayH'],
+            ],
+            [
+                'username'   => 'Michael',
+                'email'      => 'mic@gmail.com',
+                'followings' => ['keanu', 'James', 'hugo', 'RayH'],
+            ],
+            [
+                'username'   => 'keanu',
+                'email'      => 'keanu@gmail.com',
+                'followings' => ['Michael', 'James', 'hugo', 'RayH'],
+            ],
+            [
+                'username'   => 'carrie',
+                'email'      => 'carrl@gmail.com',
+                'followings' => ['keanu', 'Michael', 'hugo', 'RayH'],
+            ],
+            [
+                'username'   => 'hugo',
+                'email'      => 'hugo1123@gmail.com',
+                'followings' => ['David', 'lillllly', 'Michael', 'keanu'],
+            ],
+            [
+                'username'   => 'lillllly',
+                'email'      => 'llwachowski@yahoo.com',
+                'followings' => ['David', 'James', 'Jenny', 'RayH'],
+            ],
+            [
+                'username'   => 'joels',
+                'email'      => 'joels@yahoo.com',
+                'followings' => ['keanu', 'Michael', 'lillllly', 'RayH'],
             ],
         ];
     }
