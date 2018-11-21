@@ -31,6 +31,94 @@ class Restaurant
     protected $name;
 
     /**
+     * @OGM\Property(type="string")
+     * @var string
+     */
+    protected $image_url;
+
+    /**
+     * @OGM\Property(type="string")
+     * @var string
+     */
+    protected $phone;
+
+    /**
+     * @OGM\Property(type="string")
+     * @var string
+     */
+    protected $address;
+
+    /**
+     * @OGM\Property(type="string")
+     * @var string
+     */
+    protected $city;
+
+    /**
+     * @return mixed
+     */
+    public function getCity()
+    {
+        return $this->city;
+    }
+
+    /**
+     * @param string $city
+     */
+    public function setCity(string $city): void
+    {
+        $this->city = $city;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAddress()
+    {
+        return $this->address;
+    }
+
+    /**
+     * @param string $address
+     */
+    public function setAddress(string $address): void
+    {
+        $this->address = $address;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPhone()
+    {
+        return $this->phone;
+    }
+
+    /**
+     * @param string $phone
+     */
+    public function setPhone(string $phone): void
+    {
+        $this->phone = $phone;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getImageUrl()
+    {
+        return $this->image_url;
+    }
+
+    /**
+     * @param mixed $image_url
+     */
+    public function setImageUrl($image_url): void
+    {
+        $this->image_url = $image_url;
+    }
+
+    /**
      * @return mixed
      */
     public function getName()
