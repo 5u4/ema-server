@@ -23,7 +23,7 @@ class UserResource extends JsonResource
             'id'        => $this->id,
             'username'  => $this->username,
             'email'     => $this->email,
-            'avatarUrl' => action('AvatarController@show', ['user' => $this->id]),
+            'avatarUrl' => $this->avatar_path ? action('AvatarController@show', ['user' => $this->id]) : null,
             'lastLogin' => $lastLogin,
             'createdAt' => $createdAt,
             'updatedAt' => $updatedAt,

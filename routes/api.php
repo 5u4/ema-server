@@ -51,6 +51,8 @@ Route::group(['prefix' => 'v1'], function () {
         Route::put('/{user}/disable', 'UserController@disable');
         Route::put('/{id}/restore', 'UserController@enable');
         Route::put('/{user}/permissions', 'UserController@updateUserPermissions');
+        Route::patch('/{user}/permissions/{permission}/enable', 'UserController@enableUserPermission');
+        Route::patch('/{user}/permissions/{permission}/disable', 'UserController@disableUserPermission');
     });
 
     /* Permission */
