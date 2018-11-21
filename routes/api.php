@@ -12,6 +12,11 @@
 */
 
 /* Version 1 */
+
+use App\Http\Middleware\CanDisableUser;
+use App\Http\Middleware\CanModUser;
+use App\Http\Middleware\CanReadUser;
+
 Route::group(['prefix' => 'v1'], function () {
     /* Auth */
     Route::group(['prefix' => 'auth'], function () {
@@ -39,7 +44,7 @@ Route::group(['prefix' => 'v1'], function () {
 
     /* User */
     Route::group(['prefix' => 'user', 'middleware' => 'auth'], function () {
-        Route::get('/', 'UserController@index');
+        Route::get('/', 'UserController@index')->middleware(CanReadUser::class);
         Route::get('/{user}', 'UserController@show');
         Route::get("/friends/index", 'UserController@friends');
         Route::get('/friends/suggestions', 'UserController@commonfriends');
@@ -48,11 +53,10 @@ Route::group(['prefix' => 'v1'], function () {
         Route::post('/followings/{user}', 'UserController@follow');
         Route::patch('/', 'UserController@update');
         Route::delete('/followings/{user}', 'UserController@unfollow');
-        Route::put('/{user}/disable', 'UserController@disable');
-        Route::put('/{id}/restore', 'UserController@enable');
-        Route::put('/{user}/permissions', 'UserController@updateUserPermissions');
-        Route::patch('/{user}/permissions/{permission}/enable', 'UserController@enableUserPermission');
-        Route::patch('/{user}/permissions/{permission}/disable', 'UserController@disableUserPermission');
+        Route::put('/{user}/disable', 'UserController@disable')->middleware(CanDisableUser::class);
+        Route::put('/{id}/restore', 'UserController@enable')->middleware(CanDisableUser::class);
+        Route::patch('/{user}/permissions/{permission}/enable', 'UserController@enableUserPermission')->middleware(CanModUser::class);
+        Route::patch('/{user}/permissions/{permission}/disable', 'UserController@disableUserPermission')->middleware(CanModUser::class);
     });
 
     /* Permission */
@@ -90,5 +94,11 @@ Route::group(['prefix' => 'v1'], function () {
     Route::group(['prefix' => 'logs', 'middleware' => 'auth'], function () {
         Route::get('/', 'LogController@index');
         Route::get('/{user}', 'LogController@show');
+    });
+
+    /* Stat */
+    Route::group(['prefix' => 'stats', 'middleware' => ['auth', CanReadUser::class]], function () {
+        Route::get('/new-users', 'StatController@getNewUserStats');
+        Route::get('/user-activities', 'StatController@getActivityStats');
     });
 });
