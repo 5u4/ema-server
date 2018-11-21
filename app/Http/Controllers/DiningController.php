@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Dining\CreateDiningRequest;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 use App\Services\DiningService;
 use App\Http\Resources\DiningResource;
@@ -50,6 +52,13 @@ class DiningController extends Controller
         $restaurant = $this->diningService->getUserRestaurants($userId);
 
         return FavRestaurantResource::collection(collect($restaurant))->response();
+    }
+
+    public function addFavouriteRestaurants(CreateDiningRequest $request): JsonResponse
+    {
+        $restaurant = $this->diningService->createRestaurant(Auth::id(), $request->name, $request->rest_id);
+
+        return FavRestaurantResource::make($restaurant)->response()->setStatusCode(Response::HTTP_CREATED);
     }
 
 }

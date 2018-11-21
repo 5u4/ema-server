@@ -25,6 +25,28 @@ class Restaurant
     protected $id;
 
     /**
+     * @OGM\Property(type="string")
+     * @var string
+     */
+    protected $name;
+
+    /**
+     * @return mixed
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param mixed $name
+     */
+    public function setName($name): void
+    {
+        $this->name = $name;
+    }
+
+    /**
      * Restaurant constructor.
      */
     public function __construct()

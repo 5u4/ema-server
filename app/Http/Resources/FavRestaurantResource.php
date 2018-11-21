@@ -19,6 +19,7 @@ class FavRestaurantResource extends JsonResource
         return [
             'id'    => $this->getId(),
             'rest_id'  => $this->getRestId(),
+            'name' => $this->getName(),
         ];
     }
 }

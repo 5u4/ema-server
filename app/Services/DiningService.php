@@ -79,4 +79,22 @@ class DiningService
             ->getResult();
     }
 
+    public function createRestaurant(int $userId, string $name, string $rest_id)
+    {
+        $query = "
+            MERGE (u:User {sqlId: {id}})
+            MERGE (r:Restaurant {rest_id: {rest_id}})
+            MERGE (u)-[:favs]->(r)
+            SET r.name = {name}
+            RETURN r
+        ";
+
+        return $this->entityManager->createQuery($query)
+            ->setParameter('id', $userId)
+            ->setParameter('name', $name)
+            ->setParameter('rest_id', $rest_id)
+            ->addEntityMapping('r', Restaurant::class)
+            ->getOneResult();
+    }
+
 }
