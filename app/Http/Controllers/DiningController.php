@@ -32,11 +32,11 @@ class DiningController extends Controller
         $location = $request->get('location') ?? '';
         $price = $request->get('price') ?? '';
         $categories = $request->get('categories') ?? '';
-        $sortby = $request->get('sortby') ?? '';
+        $sort_by = $request->get('sort_by') ?? '';
         $attributes = $request->get('attributes') ?? '';
 
         $open_now = $request->get('open_now') ?? '';
-        $restaurants = $this->diningService->search($location, $price,$categories,$sortby,$attributes,$open_now);
+        $restaurants = $this->diningService->search($location, $price,$categories,$sort_by,$attributes,$open_now);
 
         return DiningResource::collection(collect($restaurants))->response();
 
