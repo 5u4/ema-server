@@ -51,10 +51,6 @@ class UserController extends Controller
      */
     public function index(): JsonResponse
     {
-        if (Auth::user()->canViewUsers() === false) {
-            throw new AccessDeniedHttpException("You do not have the permission to view users");
-        }
-
         return UserResource::collection(User::withTrashed()->get())->response();
     }
 
@@ -156,10 +152,6 @@ class UserController extends Controller
      */
     public function disable(User $user): JsonResponse
     {
-        if (Auth::user()->canDisableUsers() === false) {
-            throw new AccessDeniedHttpException("You do not have the permission to disable users");
-        }
-
         if (Auth::id() === $user->id) {
             throw new BadRequestHttpException("You are not allowed to disable yourself");
         }
@@ -178,10 +170,6 @@ class UserController extends Controller
      */
     public function enable(int $id): JsonResponse
     {
-        if (Auth::user()->canDisableUsers() === false) {
-            throw new AccessDeniedHttpException("You do not have the permission to enable users");
-        }
-
         if (Auth::id() === $id) {
             throw new BadRequestHttpException("You are not allowed to enable yourself");
         }
@@ -203,10 +191,6 @@ class UserController extends Controller
      */
     public function enableUserPermission(User $user, Permission $permission): JsonResponse
     {
-        if (Auth::user()->canUpdateUserPermissions() === false) {
-            throw new AccessDeniedHttpException("You do not have the permission to modify users");
-        }
-
         if (Auth::id() === $user->id) {
             throw new BadRequestHttpException("You are not allowed to modify your permissions");
         }
@@ -232,10 +216,6 @@ class UserController extends Controller
      */
     public function disableUserPermission(User $user, Permission $permission): JsonResponse
     {
-        if (Auth::user()->canUpdateUserPermissions() === false) {
-            throw new AccessDeniedHttpException("You do not have the permission to modify users");
-        }
-
         if (Auth::id() === $user->id) {
             throw new BadRequestHttpException("You are not allowed to modify your permissions");
         }

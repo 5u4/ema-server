@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Log\ShowLogRequest;
+use App\Http\Requests\Logs\ShowLogRequest;
 use App\Http\Resources\LogFlowResource;
 use App\Models\Sql\User;
 use App\Services\LogService;
