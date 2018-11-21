@@ -29,26 +29,24 @@ class DemoTest extends TestCase
 
     /**
      * Set up
+     * @throws \Exception
      */
     protected function setUp()
     {
         parent::setUp();
-        Artisan::call('migrate:refresh', ['--seed' => true]);
         $this->entityManager = $this->app->make(EntityManager::class);
+        $this->removeNeoDatabaseContent();
+        Artisan::call('migrate:refresh', ['--seed' => true]);
     }
 
     /**
      * @test
-     *
-     * @throws \Exception
      *
      * NOTE: This is not the right way of writing tests!!!
      * The test is used for generating demo data (and do simple tests on some endpoints).
      */
     public function demoTest()
     {
-        $this->removeNeoDatabaseContent();
-
         $this->registerAndLogin();
 
         $this->createSomeExpenses();

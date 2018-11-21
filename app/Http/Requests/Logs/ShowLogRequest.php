@@ -1,15 +1,16 @@
 <?php
 
-namespace App\Http\Requests\Users;
+namespace App\Http\Requests\Logs;
 
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * Class UpdateUserPermissionRequest
- * @package App\Http\Requests\Users
- * @property array $permissions
+ * Class DisplayLogRequest
+ * @package App\Http\Requests
+ * @property int $page
+ * @property int $perPage
  */
-class UpdateUserPermissionRequest extends FormRequest
+class ShowLogRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -29,8 +30,8 @@ class UpdateUserPermissionRequest extends FormRequest
     public function rules()
     {
         return [
-            'permissions'   => 'required|array',
-            'permissions.*' => 'required|exists:permissions,id',
+            'page' => 'int|min:1',
+            'perPage' => 'int|min:1',
         ];
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Neo\Log;
 use Illuminate\Http\JsonResponse;
 use App\Services\TransactionService;
 use App\Http\Resources\TransactionResource;
@@ -74,6 +75,8 @@ class TransactionController extends Controller
             Auth::id(), $request->amount, $request->description, $request->timestamp ?? time(), $tags
         );
 
+        Log::activity('transaction.create', $transaction->getId());
+
         return TransactionResource::make($transaction)->response()->setStatusCode(Response::HTTP_CREATED);
     }
 
@@ -90,6 +93,8 @@ class TransactionController extends Controller
         $transaction = $this->transactionService->updateTransactionById(
             Auth::id(), $id, $request->amount, $request->description, $request->timestamp ?? null, $tags ?? []
         );
+
+        Log::activity('transaction.update', $transaction->getId());
 
         return TransactionResource::make($transaction)->response();
     }
@@ -119,6 +124,8 @@ class TransactionController extends Controller
         $transaction = $this->transactionService->getUserTransactionById($userId, $id);
 
         $this->transactionService->deleteTransactionById($userId, $id);
+
+        Log::activity('transaction.delete');
 
         return TransactionResource::make($transaction)->response();
     }
