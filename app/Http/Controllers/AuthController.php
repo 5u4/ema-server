@@ -71,6 +71,10 @@ class AuthController extends Controller
      */
     public function login(LoginRequest $request): JsonResponse
     {
+        if (User::where('email', $request->email)->exists() === false) {
+            throw new AccessDeniedHttpException("Your account is banned. Please contact the admin to restore your account");
+        }
+
         /* Fail user if password is incorrect */
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password]) === false) {
             throw new AccessDeniedHttpException("Email and password are not matched.");

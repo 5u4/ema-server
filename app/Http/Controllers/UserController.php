@@ -6,6 +6,7 @@ use App\Http\Requests\Users\UpdateUserPermissionRequest;
 use App\Http\Requests\Users\UpdateUserRequest;
 use App\Http\Resources\PermissionResource;
 use App\Http\Resources\UserResource;
+use App\Models\Sql\Permission;
 use App\Models\Sql\User;
 use Illuminate\Http\JsonResponse;
 use App\Services\UserService;
@@ -182,12 +183,12 @@ class UserController extends Controller
     }
 
     /**
-     * @param UpdateUserPermissionRequest $request
      * @param User $user
+     * @param Permission $permission
      *
      * @return JsonResponse
      */
-    public function updateUserPermissions(UpdateUserPermissionRequest $request, User $user): JsonResponse
+    public function enableUserPermission(User $user, Permission $permission): JsonResponse
     {
         if (Auth::user()->canUpdateUserPermissions() === false) {
             throw new AccessDeniedHttpException("You do not have the permission to modify users");
@@ -197,10 +198,41 @@ class UserController extends Controller
             throw new BadRequestHttpException("You are not allowed to modify your permissions");
         }
 
-        $user->permissions()->sync($request->permissions);
+        if ($user->permissions->contains('id', $permission->id) === false) {
+            $user->permissions()->attach($permission->id);
+        }
 
-        return UserResource::make($user)->additional([
-            'permissions' => PermissionResource::collection($user->permissions),
-        ])->response();
+        return response()->json([
+            'data' => [
+                'enabled' => $user->permissions()->where('permission_id', $permission->id)->count() === 1,
+            ],
+        ]);
+    }
+
+    /**
+     * @param User $user
+     * @param Permission $permission
+     *
+     * @return JsonResponse
+     */
+    public function disableUserPermission(User $user, Permission $permission): JsonResponse
+    {
+        if (Auth::user()->canUpdateUserPermissions() === false) {
+            throw new AccessDeniedHttpException("You do not have the permission to modify users");
+        }
+
+        if (Auth::id() === $user->id) {
+            throw new BadRequestHttpException("You are not allowed to modify your permissions");
+        }
+
+        if ($user->permissions->contains('id', $permission->id) === true) {
+            $user->permissions()->detach($permission->id);
+        }
+
+        return response()->json([
+            'data' => [
+                'enabled' => $user->permissions()->where('permission_id', $permission->id)->count() === 1,
+            ],
+        ]);
     }
 }

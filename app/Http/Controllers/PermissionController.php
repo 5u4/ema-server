@@ -34,6 +34,10 @@ class PermissionController extends Controller
             throw new AccessDeniedHttpException("You do not have the permission to view users");
         }
 
-        return PermissionResource::collection($user->permissions)->response();
+        return response()->json([
+            'data' => [
+                'permissionIds' => $user->permissions->pluck('id')
+            ]
+        ]);
     }
 }

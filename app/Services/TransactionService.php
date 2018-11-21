@@ -30,6 +30,8 @@ class TransactionService
     private const TRANSACTION_SEARCH_TAG_SYMBOL = '#';
     private const TRANSACTION_PIE_CHART_UNTAGGED = 'untagged';
     private const TRANSACTION_LINE_CHART_DATE_FORMAT = 'Y-m-d';
+    private const TRANSACTION_CHART_MIN_NUMBERS = 10;
+    private const TRANSACTION_LINE_CHART_TIMESTAMP_STEP = 86400;
 
     /** @var EntityManager $entityManager */
     private $entityManager;
@@ -391,6 +393,41 @@ class TransactionService
         return !$res;
     }
 
+    /**
+     * To make the graph look nicer, fill in some empty data when there is no enough data
+     *
+     * @param array $transactions
+     *
+     * @return array
+     */
+    private function fillInEmptyDataInLineChart(array $transactions): array
+    {
+        $transactionCount = count($transactions);
+
+        $numberOfTxToAdd = self::TRANSACTION_CHART_MIN_NUMBERS - $transactionCount;
+
+        if ($numberOfTxToAdd <= 0) {
+            return $transactions;
+        }
+
+        if ($transactionCount === 0) {
+            $date = date(self::TRANSACTION_LINE_CHART_DATE_FORMAT, time());
+            $transactions[$date] = 0;
+        }
+
+        $timestamp = strtotime(array_keys($transactions)[0]);
+
+        while ($numberOfTxToAdd > 0) {
+            $timestamp -= self::TRANSACTION_LINE_CHART_TIMESTAMP_STEP;
+            $date = date(self::TRANSACTION_LINE_CHART_DATE_FORMAT, $timestamp);
+            $transactions[$date] = 0;
+            $numberOfTxToAdd--;
+        }
+
+        ksort($transactions);
+
+        return $transactions;
+    }
 
     /**
      * @param array $transactions
@@ -413,6 +450,8 @@ class TransactionService
                 $xs[$x] = $transaction->getAmount();
             }
         }
+
+        $xs = $this->fillInEmptyDataInLineChart($xs);
 
         foreach ($xs as $x => $y) {
             $results[] = [
