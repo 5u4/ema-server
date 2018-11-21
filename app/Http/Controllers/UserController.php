@@ -6,6 +6,7 @@ use App\Http\Requests\Users\UpdateUserPermissionRequest;
 use App\Http\Requests\Users\UpdateUserRequest;
 use App\Http\Resources\PermissionResource;
 use App\Http\Resources\UserResource;
+use App\Models\Neo\Log;
 use App\Models\Sql\Permission;
 use App\Models\Sql\User;
 use Illuminate\Http\JsonResponse;
@@ -15,7 +16,10 @@ use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-
+/**
+ * Class UserController
+ * @package App\Http\Controllers
+ */
 class UserController extends Controller
 {
     private $userService;
@@ -41,6 +45,7 @@ class UserController extends Controller
 
         return UserResource::make($user)->additional($relationships)->response();
     }
+
     /**
      * @return JsonResponse
      */
@@ -111,6 +116,8 @@ class UserController extends Controller
     {
         $following = $this->userService->followUser(Auth::id(), $user->id);
 
+        Log::activity('user.follow', $following->getId());
+
         return UserResource::make(User::find($following->getSqlId()))->response();
     }
 
@@ -122,7 +129,9 @@ class UserController extends Controller
      */
     public function unfollow(User $user): JsonResponse
     {
-        $this->userService->unFollowUser(Auth::id(), $user->id);
+        $unfollowedUser = $this->userService->unFollowUser(Auth::id(), $user->id);
+
+        Log::activity('user.unfollow', $unfollowedUser->getId());
 
         return UserResource::make($user)->response();
     }
@@ -157,6 +166,8 @@ class UserController extends Controller
 
         $user->delete();
 
+        Log::activity('user.disable', $user->id, true);
+
         return UserResource::make($user)->response();
     }
 
@@ -178,6 +189,8 @@ class UserController extends Controller
         $user = User::onlyTrashed()->findOrFail($id);
 
         $user->restore();
+
+        Log::activity('user.enable', $user->id, true);
 
         return UserResource::make($user)->response();
     }
@@ -201,6 +214,8 @@ class UserController extends Controller
         if ($user->permissions->contains('id', $permission->id) === false) {
             $user->permissions()->attach($permission->id);
         }
+
+        Log::activity('user.enable.permission', $user->id, true);
 
         return response()->json([
             'data' => [
@@ -228,6 +243,8 @@ class UserController extends Controller
         if ($user->permissions->contains('id', $permission->id) === true) {
             $user->permissions()->detach($permission->id);
         }
+
+        Log::activity('user.disable.permission', $user->id, true);
 
         return response()->json([
             'data' => [
