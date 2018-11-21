@@ -76,8 +76,9 @@ class MovieService
     {
         $query = "
             MERGE (u:User {sqlId: {id}})
-            MERGE (m:Movie {name: {name}, movieId: {movieId}, posterURL: {posterURL}})
+            MERGE (m:Movie {movieId: {movieId}})
             MERGE (u)-[:WATCH_MOVIE]->(m)
+            SET m.name = {name}, m.posterURL = {posterURL}
             RETURN m
         ";
 
