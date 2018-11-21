@@ -107,27 +107,11 @@ class DiningService
             MATCH (u:User {sqlId: {uid}})
             MATCH (r:Restaurant {rest_id: {id}})
             MATCH (u)-[f:favs]->(r)
-            DELETE f
+            DETACH DELETE r
         ";
 
         $this->entityManager->createQuery($query)
             ->setParameter('uid', $userId)
-            ->setParameter('id', $rest_id)
-            ->execute();
-    }
-
-    /**
-     * @param string $rest_id
-     * @throws \Exception
-     */
-    public function  deleteDetachedRestaurant(string $rest_id)
-    {
-        $query = "
-            MATCH (r:Restaurant {rest_id: {id}})
-            DELETE r
-        ";
-
-        $this->entityManager->createQuery($query)
             ->setParameter('id', $rest_id)
             ->execute();
     }

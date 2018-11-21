@@ -81,8 +81,6 @@ class DiningController extends Controller
 
         $this->diningService->detachDeleteRestaurant($userId, $rest_id);
 
-        $this->diningService->deleteDetachedRestaurant($rest_id);
-
         return FavRestaurantResource::make($restaurant)->response();
     }
 
