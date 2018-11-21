@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Services;
+use App\Models\Neo\Restaurant;
 use GuzzleHttp\Client as GuzzleHttpClient;
 use GuzzleHttp\Exception\RequestException;
 use GraphAware\Neo4j\OGM\EntityManager;
@@ -64,6 +65,18 @@ class DiningService
             return $response;
         }
 
+    }
+
+    public function getUserRestaurants(int $userId)
+    {
+        $query = "
+            MATCH (u:User {sqlId: {id}})-[:favs]->(r:Restaurant)
+            RETURN DISTINCT r
+        ";
+        return $this->entityManager->createQuery($query)
+            ->setParameter('id', $userId)
+            ->addEntityMapping('r', Restaurant::class)
+            ->getResult();
     }
 
 }

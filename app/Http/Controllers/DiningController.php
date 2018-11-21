@@ -6,7 +6,9 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Services\DiningService;
 use App\Http\Resources\DiningResource;
+use App\Http\Resources\FavRestaurantResource;
 use Illuminate\Support\Facades\Auth;
+use Psy\Util\Json;
 
 /**
  * Class DiningController
@@ -39,9 +41,15 @@ class DiningController extends Controller
         $restaurants = $this->diningService->search($location, $price,$categories,$sort_by,$attributes,$open_now);
 
         return DiningResource::collection(collect($restaurants))->response();
+    }
 
+    public function findFavouriteRestaurants(): JsonResponse
+    {
+        $userId = Auth::id();
 
+        $restaurant = $this->diningService->getUserRestaurants($userId);
 
+        return FavRestaurantResource::collection(collect($restaurant))->response();
     }
 
 }
