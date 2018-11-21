@@ -39,6 +39,7 @@ Route::group(['prefix' => 'v1'], function () {
 
     /* User */
     Route::group(['prefix' => 'user', 'middleware' => 'auth'], function () {
+        Route::post('/invite', 'UserController@sendmail');
         Route::get('/', 'UserController@index');
         Route::get('/{user}', 'UserController@show');
         Route::get("/friends/index", 'UserController@friends');
