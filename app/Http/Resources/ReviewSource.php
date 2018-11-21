@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Sql\User;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ReviewSource extends JsonResource
@@ -14,11 +15,15 @@ class ReviewSource extends JsonResource
      */
     public function toArray($request)
     {
+        $userId = $this->getUserId();
+        $userName = User::find($userId)->username;
+
         return Array(
             "id" => $this->getId(),
             "reviewTitle" => $this->getReviewTitle(),
             "reviewContent" => $this->getReviewContent(),
-            "userId" => $this->getUserId(),
+            "username" => $userName,
+            "rate" => $this->getRate(),
         );
     }
 }

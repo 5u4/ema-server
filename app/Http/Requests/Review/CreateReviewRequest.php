@@ -27,6 +27,7 @@ class CreateReviewRequest extends FormRequest
             'reviewTitle' => 'required|string',
             'reviewContent' => 'required|string',
             'movieId' => 'required|integer',
+            'rate' => 'required|integer|between:1,5'
         ];
     }
 
@@ -42,6 +43,9 @@ class CreateReviewRequest extends FormRequest
             'reviewTitle.required' => 'The :attribute field is required',
             'movieId.required' => 'The :attribute field is required',
             'movieId.integer' => 'The :attribute field must be integer',
+            'rate.required' => 'The :attribute field is required',
+            'rate.integer' => 'The :attribute field must be integer',
+            'rate.between'  => 'The :attribute field should be between :min and :max',
         ];
     }
 }

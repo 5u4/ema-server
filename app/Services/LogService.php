@@ -77,4 +77,24 @@ class LogService
             ->addEntityMapping('log', Log::class)
             ->getResult();
     }
+
+    /**
+     * @param int $start
+     * @param int $end
+     *
+     * @return int
+     */
+    public function getActivityCountInGivenPeriod(int $start, int $end): int
+    {
+        $query = "
+            MATCH (:User)-[:LOGGED]->(l:Log)
+            WHERE l.timestamp >= {start} AND l.timestamp < {end}
+            RETURN count(DISTINCT l) AS count
+        ";
+
+        return $this->entityManager->createQuery($query)
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->getOneResult()['count'];
+    }
 }

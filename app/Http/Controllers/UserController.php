@@ -6,6 +6,7 @@ use App\Http\Requests\Users\UpdateUserPermissionRequest;
 use App\Http\Requests\Users\UpdateUserRequest;
 use App\Http\Resources\PermissionResource;
 use App\Http\Resources\UserResource;
+use App\Mail\Invitation;
 use App\Models\Neo\Log;
 use App\Models\Sql\Permission;
 use App\Models\Sql\User;
@@ -15,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Mail;
 
 /**
  * Class UserController
@@ -231,5 +233,14 @@ class UserController extends Controller
                 'enabled' => $user->permissions()->where('permission_id', $permission->id)->count() === 1,
             ],
         ]);
+    }
+
+    public function sendmail(Request $request){
+
+       $user = Auth::user()->username;
+       $friend= $request->friend;
+       $item = $request->item;
+        Mail::to($request->email)->send(new Invitation($user,$friend,$item));
+        return "success";
     }
 }
