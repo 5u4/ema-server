@@ -23,6 +23,7 @@ class ReviewSource extends JsonResource
             "reviewTitle" => $this->getReviewTitle(),
             "reviewContent" => $this->getReviewContent(),
             "username" => $userName,
+            "userId" => $userId,
             "rate" => $this->getRate(),
         );
     }
