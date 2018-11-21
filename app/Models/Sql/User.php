@@ -97,4 +97,12 @@ class User extends Authenticatable
     {
         return $this->permissions->contains('name', Permission::UPDATE_PERMISSION_PERMISSION);
     }
+
+    /**
+     * @return bool
+     */
+    public function canDeleteComments(): bool
+    {
+        return $this->permissions->contains('name', Permission::DELETE_COMMENT_PERMISSION);
+    }
 }

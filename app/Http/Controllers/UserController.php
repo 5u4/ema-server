@@ -7,6 +7,7 @@ use App\Http\Requests\Users\UpdateUserRequest;
 use App\Http\Resources\PermissionResource;
 use App\Http\Resources\UserResource;
 use App\Mail\Invitation;
+use App\Models\Neo\Log;
 use App\Models\Sql\Permission;
 use App\Models\Sql\User;
 use Illuminate\Http\JsonResponse;
@@ -15,10 +16,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-
 use Mail;
 
-
+/**
+ * Class UserController
+ * @package App\Http\Controllers
+ */
 class UserController extends Controller
 {
     private $userService;
@@ -44,15 +47,12 @@ class UserController extends Controller
 
         return UserResource::make($user)->additional($relationships)->response();
     }
+
     /**
      * @return JsonResponse
      */
     public function index(): JsonResponse
     {
-        if (Auth::user()->canViewUsers() === false) {
-            throw new AccessDeniedHttpException("You do not have the permission to view users");
-        }
-
         return UserResource::collection(User::withTrashed()->get())->response();
     }
 
@@ -114,6 +114,8 @@ class UserController extends Controller
     {
         $following = $this->userService->followUser(Auth::id(), $user->id);
 
+        Log::activity('user.follow', $following->getId());
+
         return UserResource::make(User::find($following->getSqlId()))->response();
     }
 
@@ -125,7 +127,9 @@ class UserController extends Controller
      */
     public function unfollow(User $user): JsonResponse
     {
-        $this->userService->unFollowUser(Auth::id(), $user->id);
+        $unfollowedUser = $this->userService->unFollowUser(Auth::id(), $user->id);
+
+        Log::activity('user.unfollow', $unfollowedUser->getId());
 
         return UserResource::make($user)->response();
     }
@@ -150,15 +154,13 @@ class UserController extends Controller
      */
     public function disable(User $user): JsonResponse
     {
-        if (Auth::user()->canDisableUsers() === false) {
-            throw new AccessDeniedHttpException("You do not have the permission to disable users");
-        }
-
         if (Auth::id() === $user->id) {
             throw new BadRequestHttpException("You are not allowed to disable yourself");
         }
 
         $user->delete();
+
+        Log::activity('user.disable', $user->id, true);
 
         return UserResource::make($user)->response();
     }
@@ -170,10 +172,6 @@ class UserController extends Controller
      */
     public function enable(int $id): JsonResponse
     {
-        if (Auth::user()->canDisableUsers() === false) {
-            throw new AccessDeniedHttpException("You do not have the permission to enable users");
-        }
-
         if (Auth::id() === $id) {
             throw new BadRequestHttpException("You are not allowed to enable yourself");
         }
@@ -181,6 +179,8 @@ class UserController extends Controller
         $user = User::onlyTrashed()->findOrFail($id);
 
         $user->restore();
+
+        Log::activity('user.enable', $user->id, true);
 
         return UserResource::make($user)->response();
     }
@@ -193,10 +193,6 @@ class UserController extends Controller
      */
     public function enableUserPermission(User $user, Permission $permission): JsonResponse
     {
-        if (Auth::user()->canUpdateUserPermissions() === false) {
-            throw new AccessDeniedHttpException("You do not have the permission to modify users");
-        }
-
         if (Auth::id() === $user->id) {
             throw new BadRequestHttpException("You are not allowed to modify your permissions");
         }
@@ -204,6 +200,8 @@ class UserController extends Controller
         if ($user->permissions->contains('id', $permission->id) === false) {
             $user->permissions()->attach($permission->id);
         }
+
+        Log::activity('user.enable.permission', $user->id, true);
 
         return response()->json([
             'data' => [
@@ -220,10 +218,6 @@ class UserController extends Controller
      */
     public function disableUserPermission(User $user, Permission $permission): JsonResponse
     {
-        if (Auth::user()->canUpdateUserPermissions() === false) {
-            throw new AccessDeniedHttpException("You do not have the permission to modify users");
-        }
-
         if (Auth::id() === $user->id) {
             throw new BadRequestHttpException("You are not allowed to modify your permissions");
         }
@@ -231,6 +225,8 @@ class UserController extends Controller
         if ($user->permissions->contains('id', $permission->id) === true) {
             $user->permissions()->detach($permission->id);
         }
+
+        Log::activity('user.disable.permission', $user->id, true);
 
         return response()->json([
             'data' => [

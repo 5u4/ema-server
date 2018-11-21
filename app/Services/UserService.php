@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Services;
-use Illuminate\Support\Facades\DB;
 use App\Models\Sql\User;
 use App\Models\Neo\User as NeoUser;
 use GraphAware\Neo4j\OGM\EntityManager;
@@ -45,22 +44,21 @@ class UserService
     }
 
     /**
- * Insert an user into neo database (Without validation)
- *
- * @param $sqlId
- * @return NeoUser
- * @throws \Exception
- */
-    public function createUserInNeo($sqlId)
+     * @param int $sqlId
+     *
+     * @return NeoUser
+     */
+    public function createUserInNeo(int $sqlId): NeoUser
     {
-        $user = new NeoUser();
+        $query = "
+            MERGE (u:User {sqlId: {id}})
+            RETURN u
+        ";
 
-        $user->setSqlId($sqlId);
-
-        $this->entityManager->persist($user);
-        $this->entityManager->flush();
-
-        return $user;
+        return $this->entityManager->createQuery($query)
+            ->setParameter('id', $sqlId)
+            ->addEntityMapping('u', NeoUser::class)
+            ->getOneResult();
     }
 
     /**
@@ -133,28 +131,29 @@ class UserService
      * @param int $id
      * @param int $unFollowingId
      *
-     * @return array|mixed
-     * @throws \Exception
+     * @return NeoUser
      */
-    public function unFollowUser(int $id, int $unFollowingId)
+    public function unFollowUser(int $id, int $unFollowingId): NeoUser
     {
         $query = "
-            MATCH (:User {sqlId: {id}})-[r:FOLLOW]->(:User {sqlId: {fid}})
+            MATCH (:User {sqlId: {id}})-[r:FOLLOW]->(u:User {sqlId: {fid}})
             DELETE r
+            RETURN u
         ";
 
         return $this->entityManager->createQuery($query)
             ->setParameter('id', $id)
             ->setParameter('fid', $unFollowingId)
-            ->execute();
+            ->addEntityMapping('u', NeoUser::class)
+            ->getOneResult();
     }
 
     /**
      * @param int $id
      *
-     * @return mixed
+     * @return NeoUser
      */
-    public function getNeoUser(int $id)
+    public function getNeoUser(int $id): NeoUser
     {
         $query = "
             MATCH (u:User {sqlId: {id}})

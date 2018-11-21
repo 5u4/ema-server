@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Resources\UserResource;
+use App\Models\Neo\Log;
 use App\Models\Sql\User;
 use App\Services\AuthService;
 use App\Services\UserService;
@@ -51,6 +52,8 @@ class AuthController extends Controller
 
             Auth::setUser($user);
 
+            Log::activity('auth.register');
+
             return $user;
         });
 
@@ -84,6 +87,8 @@ class AuthController extends Controller
         $user = Auth::user();
         $user->last_login = Carbon::now();
         $user->save();
+
+        Log::activity('auth.login');
 
         $additionalInfo = [
             'token' => $this->authService->getAuthToken(),
