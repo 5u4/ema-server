@@ -26,7 +26,6 @@ class TransactionTest extends TestCase
     public function transactionTest()
     {
 
-        $this->removeNeoDatabaseContent();
         $this->registerAndLogin();
         $this->createSomeExpenses();
 
@@ -35,8 +34,9 @@ class TransactionTest extends TestCase
     protected function setUp()
     {
         parent::setUp();
-        Artisan::call('migrate:refresh', ['--seed' => true]);
         $this->entityManager = $this->app->make(EntityManager::class);
+        $this->removeNeoDatabaseContent();
+        Artisan::call('migrate:refresh', ['--seed' => true]);
     }
 
     /**
@@ -69,26 +69,26 @@ class TransactionTest extends TestCase
 
     private function createSomeExpenses()
     {
-         foreach ($this->expenses() as $expense) {
-             $this->post('/api/v1/transaction', [
-                 'amount' => $expense['amount'],
-                 'description' => $expense['description'],
-                 'timestamp' => $expense['timestamp'],
-                 'tags' => $expense['tags'],
-             ], $this->headers)->assertStatus(Response::HTTP_CREATED);
-             sleep(0.1);
-         }
-//        foreach ($this->expenses() as $expense) {
-//            $res = $this->post('/api/v1/transaction', [
-//                'amount' => $expense['amount'],
-//                'description' => $expense['description'],
-//                'timestamp' => $expense['timestamp'],
-//                'tags' => $expense['tags'],
-//            ], $this->headers);
-//            if ($res->getStatusCode() === 500) {
-//                dd($res->json());
-//            }
-//        }
+//         foreach ($this->expenses() as $expense) {
+//             $this->post('/api/v1/transaction', [
+//                 'amount' => $expense['amount'],
+//                 'description' => $expense['description'],
+//                 'timestamp' => $expense['timestamp'],
+//                 'tags' => $expense['tags'],
+//             ], $this->headers)->assertStatus(Response::HTTP_CREATED);
+//             sleep(0.1);
+//         }
+        foreach ($this->expenses() as $expense) {
+            $res = $this->post('/api/v1/transaction', [
+                'amount' => $expense['amount'],
+                'description' => $expense['description'],
+                'timestamp' => $expense['timestamp'],
+                'tags' => $expense['tags'],
+            ], $this->headers);
+            if ($res->getStatusCode() === 500) {
+                dd($res->json());
+            }
+        }
     }
 
     private function expenses(): array

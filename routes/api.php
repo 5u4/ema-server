@@ -100,7 +100,6 @@ Route::group(['prefix' => 'v1'], function () {
 
     /* Stat */
     Route::group(['prefix' => 'stats', 'middleware' => ['auth', CanReadUser::class]], function () {
-        Route::get('/new-users', 'StatController@getNewUserStats');
-        Route::get('/user-activities', 'StatController@getActivityStats');
+        Route::get('/', 'StatController@getStats');
     });
 });

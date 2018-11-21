@@ -14,8 +14,9 @@ use Illuminate\Support\Facades\DB;
  */
 class StatController extends Controller
 {
-    private const DEFAULT_DISPLAY_DAYS = 30;
+    private const DEFAULT_DISPLAY_DAYS = 15;
     private const ONE_DAY = 86400;
+    private const DATE_FORMAT = 'Y-m-d';
 
     /** @var LogService $logService */
     private $logService;
@@ -33,38 +34,71 @@ class StatController extends Controller
     /**
      * @return JsonResponse
      */
-    public function getNewUserStats(): JsonResponse
+    public function getStats()
     {
-        $stats = [];
+        $newUserStats = [];
+        $activityStats = [];
 
         $dateLeft = self::DEFAULT_DISPLAY_DAYS;
 
         $date = Carbon::today();
 
-        $stats[] = [
-            'x' => $date->getTimestamp(),
-            'y' => User::withTrashed()->where(User::CREATED_AT, '>', $date)->count(),
+        $userCount = User::withTrashed()->where(User::CREATED_AT, '>', $date)->count();
+        $activityCount = $this->logService->getActivityCountInGivenPeriod($date->getTimestamp(), time());
+
+        $newUserTotal = $userCount;
+        $activityTotal = $activityCount;
+
+        $newUserStats[] = [
+            'x' => $date->format(self::DATE_FORMAT),
+            'y' => $userCount,
+        ];
+
+        $activityStats[] = [
+            'x' => $date->format(self::DATE_FORMAT),
+            'y' => $activityCount,
         ];
 
         $timestamp = Carbon::yesterday()->getTimestamp();
 
         while ($dateLeft >= 0) {
-            $count = DB::table('stats')->where('timestamp', $timestamp)->first(['new_user_count']);
+            $counts = DB::table('stats')->where('timestamp', $timestamp)->first(['new_user_count', 'activity_count']);
 
-            if ($count === null) {
+            if ($counts === null) {
+                /* Get new user count */
                 $date = Carbon::createFromTimestamp($timestamp);
                 $dateBefore = Carbon::createFromTimestamp($timestamp - self::ONE_DAY);
 
-                $count = User::withTrashed()
+                $newUserCount = User::withTrashed()
                     ->whereBetween(User::CREATED_AT, [$dateBefore, $date])->count();
 
-                DB::table('stats')->updateOrInsert(['timestamp' => $timestamp], ['new_user_count' => $count]);
+                /* Get activity count */
+                $activityCount = $this->logService->getActivityCountInGivenPeriod($timestamp - self::ONE_DAY, $timestamp);
+
+                DB::table('stats')->updateOrInsert(['timestamp' => $timestamp], [
+                    'new_user_count' => $newUserCount,
+                    'activity_count' => $activityCount,
+                ]);
+            } else {
+                $newUserCount = $counts->new_user_count;
+                $activityCount = $counts->activity_count;
             }
 
-            $stats[] = [
-                'x' => $timestamp,
-                'y' => $count,
+            $x = date(self::DATE_FORMAT, $timestamp);
+
+            $newUserStats[] = [
+                'x' => $x,
+                'y' => $newUserCount,
             ];
+
+            $newUserTotal += $newUserCount;
+
+            $activityStats[] = [
+                'x' => $x,
+                'y' => $activityCount,
+            ];
+
+            $activityTotal += $activityCount;
 
             $timestamp -= self::ONE_DAY;
             $dateLeft--;
@@ -72,50 +106,10 @@ class StatController extends Controller
 
         return response()->json([
             'data' => [
-                'newUserStats' => $stats,
-            ],
-        ]);
-    }
-
-    /**
-     * @return JsonResponse
-     */
-    public function getActivityStats(): JsonResponse
-    {
-        $stats = [];
-
-        $dateLeft = self::DEFAULT_DISPLAY_DAYS;
-
-        $date = Carbon::today();
-
-        $stats[] = [
-            'x' => $date->getTimestamp(),
-            'y' => $this->logService->getActivityCountInGivenPeriod($date->getTimestamp(), time()),
-        ];
-
-        $timestamp = Carbon::yesterday()->getTimestamp();
-
-        while ($dateLeft >= 0) {
-            $count = DB::table('stats')->where('timestamp', $timestamp)->first(['activity_count']);
-
-            if ($count === null) {
-                $count = $this->logService->getActivityCountInGivenPeriod($timestamp - self::ONE_DAY, $timestamp);
-
-                DB::table('stats')->updateOrInsert(['timestamp' => $timestamp], ['activity_count' => $count]);
-            }
-
-            $stats[] = [
-                'x' => $timestamp,
-                'y' => $count,
-            ];
-
-            $timestamp -= self::ONE_DAY;
-            $dateLeft--;
-        }
-
-        return response()->json([
-            'data' => [
-                'activityStats' => $stats,
+                'newUserTotal' => $newUserTotal,
+                'activityTotal' => $activityTotal,
+                'newUserStats' => array_reverse($newUserStats),
+                'activityStats' => array_reverse($activityStats),
             ],
         ]);
     }
