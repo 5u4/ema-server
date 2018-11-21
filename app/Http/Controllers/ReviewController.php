@@ -47,7 +47,7 @@ class ReviewController extends Controller
      */
     public function store(CreateReviewRequest $request): JsonResponse
     {
-        $review = $this->reviewService->createReview(Auth::id(), $request->reviewTitle, $request->reviewContent, $request->movieId);
+        $review = $this->reviewService->createReview(Auth::id(), $request->reviewTitle, $request->reviewContent, $request->movieId, $request->rate);
 
         return ReviewSource::make($review)->response()->setStatusCode(Response::HTTP_CREATED);
     }

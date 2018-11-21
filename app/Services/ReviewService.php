@@ -65,14 +65,15 @@ class ReviewService
      * @param string $reviewTitle
      * @param string $reviewContent
      * @param int $movieId
+     * @param int $rate
      *
      * @return mixed
      */
-    public function createReview(int $userId, string $reviewTitle, string $reviewContent, int $movieId)
+    public function createReview(int $userId, string $reviewTitle, string $reviewContent, int $movieId, int $rate)
     {
         $query = "
             MERGE (m:Movie {movieId: {movieId}})
-            MERGE (m)-[:HAS_REVIEW]->(r:Review {userId: {userId}, reviewTitle: {reviewTitle}, reviewContent: {reviewContent}})
+            MERGE (m)-[:HAS_REVIEW]->(r:Review {userId: {userId}, reviewTitle: {reviewTitle}, reviewContent: {reviewContent}, rate:{rate}})
             RETURN r
         ";
 
@@ -81,6 +82,7 @@ class ReviewService
             ->setParameter('reviewTitle', $reviewTitle)
             ->setParameter('reviewContent', $reviewContent)
             ->setParameter('movieId', $movieId)
+            ->setParameter('rate', $rate)
             ->addEntityMapping('r', Review::class)
             ->getOneResult();
     }

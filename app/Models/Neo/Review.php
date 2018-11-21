@@ -37,6 +37,12 @@ class Review
     protected $userId;
 
     /**
+     * @OGM\Property(type="int")
+     * @var int
+     */
+    protected $rate;
+
+    /**
      * @OGM\Relationship(type="HAS_REVIEW", direction="INCOMING", collection=true, mappedBy="movies", targetEntity="Movie")
      * @var Movie[]|Collection
      */
@@ -77,6 +83,22 @@ class Review
     public function setUserId(int $userId): void
     {
         $this->userId = $userId;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRate(): int
+    {
+        return $this->rate;
+    }
+
+    /**
+     * @param int $rate
+     */
+    public function setRate(int $rate): void
+    {
+        $this->id = $rate;
     }
 
     /**
