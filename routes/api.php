@@ -43,9 +43,10 @@ Route::group(['prefix' => 'v1'], function () {
         Route::get('/{user}', 'UserController@show');
         Route::get("/friends/index", 'UserController@friends');
         Route::get('/friends/suggestions', 'UserController@commonfriends');
-        Route::get('/search','UserController@search');
+        Route::post('/search','UserController@search');
         Route::get('/follows/{user}', 'UserController@isFollowing');
         Route::post('/followings/{user}', 'UserController@follow');
+        Route::patch('/', 'UserController@update');
         Route::delete('/followings/{user}', 'UserController@unfollow');
         Route::put('/{user}/disable', 'UserController@disable');
         Route::put('/{id}/restore', 'UserController@enable');
