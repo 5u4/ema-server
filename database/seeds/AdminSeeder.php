@@ -2,6 +2,7 @@
 
 use App\Models\Sql\Permission;
 use App\Models\Sql\User;
+use App\Services\UserService;
 use Illuminate\Database\Seeder;
 
 class AdminSeeder extends Seeder
@@ -14,6 +15,7 @@ class AdminSeeder extends Seeder
      * Run the database seeds.
      *
      * @return void
+     * @throws Exception
      */
     public function run()
     {
@@ -27,5 +29,9 @@ class AdminSeeder extends Seeder
         foreach (Permission::all() as $permission) {
             $admin->permissions()->attach($permission->id);
         }
+
+        $userService = app()->make(UserService::class);
+
+        $userService->createUserInNeo($admin->id);
     }
 }

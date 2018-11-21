@@ -85,4 +85,10 @@ Route::group(['prefix' => 'v1'], function () {
         Route::post('/','ReviewController@store');
         Route::delete('/{reviewId}','ReviewController@destroy');
     });
+
+    /* Log */
+    Route::group(['prefix' => 'logs', 'middleware' => 'auth'], function () {
+        Route::get('/', 'LogController@index');
+        Route::get('/{user}', 'LogController@show');
+    });
 });
