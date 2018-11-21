@@ -45,6 +45,9 @@ class DiningController extends Controller
         return DiningResource::collection(collect($restaurants))->response();
     }
 
+    /**
+     * @return JsonResponse
+     */
     public function findFavouriteRestaurants(): JsonResponse
     {
         $userId = Auth::id();
@@ -54,13 +57,22 @@ class DiningController extends Controller
         return FavRestaurantResource::collection(collect($restaurant))->response();
     }
 
+    /**
+     * @param CreateDiningRequest $request
+     * @return JsonResponse
+     */
     public function addFavouriteRestaurants(CreateDiningRequest $request): JsonResponse
     {
-        $restaurant = $this->diningService->createRestaurant(Auth::id(), $request->name, $request->rest_id);
+        $restaurant = $this->diningService->createRestaurant(Auth::id(), $request->name, $request->rest_id, $request->image_url, $request->phone, $request->city, $request->address);
 
         return FavRestaurantResource::make($restaurant)->response()->setStatusCode(Response::HTTP_CREATED);
     }
 
+    /**
+     * @param string $rest_id
+     * @return JsonResponse
+     * @throws \Exception
+     */
     public function destroy(string $rest_id): JsonResponse
     {
         $userId = Auth::id();
@@ -68,6 +80,8 @@ class DiningController extends Controller
         $restaurant = $this->diningService->getDeleteUserRestaurant($userId, $rest_id);
 
         $this->diningService->detachDeleteRestaurant($userId, $rest_id);
+
+        $this->diningService->deleteDetachedRestaurant($rest_id);
 
         return FavRestaurantResource::make($restaurant)->response();
     }

@@ -8,9 +8,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class FavRestaurantResource extends JsonResource
 {
     /**
-     * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return array
      */
     public function toArray($request)
@@ -20,6 +18,10 @@ class FavRestaurantResource extends JsonResource
             'id'    => $this->getId(),
             'rest_id'  => $this->getRestId(),
             'name' => $this->getName(),
+            'image_url' => $this->getImageUrl(),
+            'phone' => $this->getPhone(),
+            'address' => $this->getAddress(),
+            'city' => $this->getCity(),
         ];
     }
 }
