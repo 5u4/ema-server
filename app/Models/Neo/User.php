@@ -32,11 +32,31 @@ class User
     protected $hasTransaction;
 
     /**
+     * @OGM\Relationship(type="HAS_TAG", direction="OUTGOING", collection=true, mappedBy="users", targetEntity="Tag")
+     * @var Tag[]|Collection
+     */
+    protected $tags;
+
+    /**
+     * @OGM\Relationship(type="FOLLOW", direction="INCOMING", collection=true, mappedBy="followings", targetEntity="User")
+     * @var User[]|Collection
+     */
+    protected $followers;
+
+    /**
+     * @OGM\Relationship(type="FOLLOW", direction="OUTGOING", collection=true, mappedBy="followers", targetEntity="User")
+     * @var User[]|Collection
+     */
+    protected $followings;
+
+    /**
      * User constructor.
      */
     public function __construct()
     {
         $this->hasTransaction = new Collection();
+        $this->followers = new Collection();
+        $this->followings = new Collection();
     }
 
     /**
@@ -77,5 +97,29 @@ class User
     public function setHasTransaction($hasTransaction)
     {
         $this->hasTransaction = $hasTransaction;
+    }
+
+    /**
+     * @return Tag[]|Collection
+     */
+    public function getTags()
+    {
+        return $this->tags;
+    }
+
+    /**
+     * @return User[]|Collection
+     */
+    public function getFollowers()
+    {
+        return $this->followers;
+    }
+
+    /**
+     * @return User[]|Collection
+     */
+    public function getFollowings()
+    {
+        return $this->followings;
     }
 }

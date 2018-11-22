@@ -25,8 +25,8 @@ class Transaction
     protected $amount;
 
     /**
-     * @OGM\Property(type="string")
-     * @var string
+     * @OGM\Property(type="int")
+     * @var int
      */
     protected $timestamp;
 
@@ -44,11 +44,18 @@ class Transaction
     protected $hasTransaction;
 
     /**
+     * @OGM\Relationship(type="TAGGED_AS", direction="OUTGOING", collection=true, mappedBy="transactions", targetEntity="Tag")
+     * @var Tag[]|Collection
+     */
+    protected $tags;
+
+    /**
      * Transaction constructor.
      */
     public function __construct()
     {
         $this->hasTransaction = new Collection();
+        $this->tags = new Collection();
     }
 
     /**
@@ -78,7 +85,7 @@ class Transaction
     /**
      * @return int
      */
-    public function getTimestamp(): string
+    public function getTimestamp(): int
     {
         return $this->timestamp;
     }
@@ -121,5 +128,13 @@ class Transaction
     public function setHasTransaction($hasTransaction)
     {
         $this->hasTransaction = $hasTransaction;
+    }
+
+    /**
+     * @return Tag[]|Collection
+     */
+    public function getTags()
+    {
+        return $this->tags;
     }
 }

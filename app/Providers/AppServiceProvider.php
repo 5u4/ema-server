@@ -30,7 +30,7 @@ class AppServiceProvider extends ServiceProvider
         }
 
         /** Neo4J EntityManager Binding */
-        $this->app->bind(EntityManager::class, function () {
+        $this->app->singleton(EntityManager::class, function () {
             return EntityManager::create(self::neoConnection());
         });
 

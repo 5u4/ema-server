@@ -18,14 +18,25 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sql\Permission whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sql\Permission whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sql\Permission newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sql\Permission newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sql\Permission query()
+ * @property string $description
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sql\Permission whereDescription($value)
  */
 class Permission extends Model
 {
     public const PERMISSIONS = [
-        'read-users',
-        'update-users',
-        'remove-users',
+        self::READ_USER_PERMISSION,
+        self::DISABLE_USER_PERMISSION,
+        self::UPDATE_PERMISSION_PERMISSION,
+        self::DELETE_COMMENT_PERMISSION,
     ];
+
+    public const READ_USER_PERMISSION = 'read-user';
+    public const DISABLE_USER_PERMISSION = 'block-user';
+    public const UPDATE_PERMISSION_PERMISSION = 'mod-user';
+    public const DELETE_COMMENT_PERMISSION = 'delete-comment';
 
     protected $fillable = [
         'name',

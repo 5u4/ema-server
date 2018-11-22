@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Carbon;
 
 /**
  * App\Models\Sql\User
@@ -36,10 +37,17 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Sql\User withTrashed()
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Sql\User withoutTrashed()
  * @mixin \Eloquent
+ * @property string|null $avatar_path
+ * @property string|null $avatar_name
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sql\User whereAvatarName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sql\User whereAvatarPath($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sql\User newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sql\User newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Sql\User query()
  */
 class User extends Authenticatable
 {
-    use Notifiable, SoftDeletes;
+    use Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -47,7 +55,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'username', 'email', 'password',
+        'username', 'email', 'password', 'last_login', 'avatar_name', 'avatar_path', 'deleted_at',
     ];
 
     /**
@@ -65,5 +73,65 @@ class User extends Authenticatable
     public function permissions(): BelongsToMany
     {
         return $this->belongsToMany(Permission::class, 'user_permissions', 'user_id', 'permission_id');
+    }
+
+    /**
+     * @return bool
+     */
+    public function isActive(): bool
+    {
+        return !$this->deleted_at;
+    }
+
+    /**
+     * Disable a user
+     */
+    public function disable()
+    {
+        $this->update([
+            'deleted_at' => Carbon::now(),
+        ]);
+    }
+
+    /**
+     * Enable a user
+     */
+    public function enable()
+    {
+        $this->update([
+            'deleted_at' => null,
+        ]);
+    }
+
+    /**
+     * @return bool
+     */
+    public function canViewUsers(): bool
+    {
+        return $this->permissions->contains('name', Permission::READ_USER_PERMISSION);
+    }
+
+    /**
+     * @return bool
+     */
+    public function canDisableUsers(): bool
+    {
+        return $this->permissions->contains('name', Permission::DISABLE_USER_PERMISSION);
+    }
+
+    /**
+     * @return bool
+     */
+    public function canUpdateUserPermissions(): bool
+    {
+        return $this->permissions->contains('name', Permission::UPDATE_PERMISSION_PERMISSION);
+    }
+
+    /**
+     * @return bool
+     */
+    public function canDeleteComments(): bool
+    {
+        return $this->permissions->contains('name', Permission::DELETE_COMMENT_PERMISSION);
     }
 }

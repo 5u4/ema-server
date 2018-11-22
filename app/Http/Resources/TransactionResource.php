@@ -14,11 +14,12 @@ class TransactionResource extends JsonResource
      */
     public function toArray($request)
     {
-        return Array(
+        return [
             "id" => $this->getId(),
             "amount" => $this->getAmount(),
             "description" => $this->getDescription(),
-            "timestamp" => $this->getTimestamp()
-        );
+            "timestamp" => date('Y-m-d', $this->getTimestamp()),
+            "tags" => TagResource::collection(collect($this->getTags())),
+        ];
     }
 }

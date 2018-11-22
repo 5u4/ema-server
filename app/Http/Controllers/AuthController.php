@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Resources\UserResource;
+use App\Models\Neo\Log;
 use App\Models\Sql\User;
 use App\Services\AuthService;
 use App\Services\UserService;
@@ -51,12 +52,19 @@ class AuthController extends Controller
 
             Auth::setUser($user);
 
+            Log::activity('auth.register');
+
             return $user;
         });
 
         $token = $this->authService->getAuthToken();
 
-        return UserResource::make($user)->additional(['token' => $token])->response();
+        $additionalInfo = [
+            'token' => $token,
+            'permissionIds' => $user->permissions->pluck('id'),
+        ];
+
+        return UserResource::make($user)->additional($additionalInfo)->response();
     }
 
     /**
@@ -66,6 +74,10 @@ class AuthController extends Controller
      */
     public function login(LoginRequest $request): JsonResponse
     {
+        if (User::where('email', $request->email)->first()->isActive() === false) {
+            throw new AccessDeniedHttpException("Your account is banned. Please contact the admin to restore your account");
+        }
+
         /* Fail user if password is incorrect */
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password]) === false) {
             throw new AccessDeniedHttpException("Email and password are not matched.");
@@ -76,8 +88,13 @@ class AuthController extends Controller
         $user->last_login = Carbon::now();
         $user->save();
 
-        return UserResource::make($user)
-            ->additional(['token' => $this->authService->getAuthToken()])
-            ->response();
+        Log::activity('auth.login');
+
+        $additionalInfo = [
+            'token' => $this->authService->getAuthToken(),
+            'permissionIds' => $user->permissions->pluck('id'),
+        ];
+
+        return UserResource::make($user)->additional($additionalInfo)->response();
     }
 }

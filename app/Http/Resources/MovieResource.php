@@ -17,6 +17,7 @@ class MovieResource extends JsonResource
         return Array(
             "id" => $this->getMovieId(),
             "name" => $this->getMovieName(),
+            "posterURL" => $this->getPosterURL(),
         );
     }
 }
