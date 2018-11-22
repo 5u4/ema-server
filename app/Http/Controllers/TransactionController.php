@@ -75,7 +75,7 @@ class TransactionController extends Controller
             Auth::id(), $request->amount, $request->description, $request->timestamp ?? time(), $tags
         );
 
-        Log::activity('transaction.create', $transaction->getId());
+        Log::activity('transaction.create');
 
         return TransactionResource::make($transaction)->response()->setStatusCode(Response::HTTP_CREATED);
     }
@@ -94,7 +94,7 @@ class TransactionController extends Controller
             Auth::id(), $id, $request->amount, $request->description, $request->timestamp ?? null, $tags ?? []
         );
 
-        Log::activity('transaction.update', $transaction->getId());
+        Log::activity('transaction.update');
 
         return TransactionResource::make($transaction)->response();
     }

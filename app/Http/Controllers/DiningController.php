@@ -66,7 +66,7 @@ class DiningController extends Controller
     {
         $restaurant = $this->diningService->createRestaurant(Auth::id(), $request->name, $request->rest_id, $request->image_url, $request->phone, $request->city, $request->address);
 
-        Log::activity('dining.favourite', $restaurant->getId());
+        Log::activity('dining.favourite');
 
         return FavRestaurantResource::make($restaurant)->response()->setStatusCode(Response::HTTP_CREATED);
     }

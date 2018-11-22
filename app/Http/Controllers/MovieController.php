@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Movies\CreateMovieRequest;
 use App\Http\Resources\MovieResource;
+use App\Models\Neo\Log;
 use App\Services\MovieService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
@@ -48,6 +49,8 @@ class MovieController extends Controller
     {
         $movie = $this->movieService->createMovie(Auth::id(), $request->name, $request->movieId, $request->posterURL);
 
+        Log::activity('movie.favourite');
+
         return MovieResource::make($movie)->response()->setStatusCode(Response::HTTP_CREATED);
     }
 
@@ -64,6 +67,8 @@ class MovieController extends Controller
         $movie = $this->movieService->getUserMovie($userId, $movieId);
 
         $this->movieService->detachDeleteMovie($userId, $movieId);
+
+        Log::activity('movie.remove.favourite');
 
         return MovieResource::make($movie)->response();
     }
