@@ -18,6 +18,7 @@ class UserResource extends JsonResource
         $lastLogin = is_null($this->last_login) ? null : strtotime($this->last_login);
         $createdAt = is_null($this->{USER::CREATED_AT}) ? null : strtotime($this->{USER::CREATED_AT});
         $updatedAt = is_null($this->{USER::UPDATED_AT}) ? null : strtotime($this->{USER::UPDATED_AT});
+        $deletedAt = is_null($this->deleted_at) ? null : strtotime($this->deleted_at);
 
         return [
             'id'        => $this->id,
@@ -27,7 +28,7 @@ class UserResource extends JsonResource
             'lastLogin' => $lastLogin,
             'createdAt' => $createdAt,
             'updatedAt' => $updatedAt,
-            'deletedAt' => $this->deleted_at,
+            'deletedAt' => $deletedAt,
         ];
     }
 }

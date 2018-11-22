@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Carbon;
 
 /**
  * App\Models\Sql\User
@@ -83,17 +84,17 @@ class User extends Authenticatable
     }
 
     /**
-     *
+     * Disable a user
      */
     public function disable()
     {
         $this->update([
-            'deleted_at' => time(),
+            'deleted_at' => Carbon::now(),
         ]);
     }
 
     /**
-     *
+     * Enable a user
      */
     public function enable()
     {

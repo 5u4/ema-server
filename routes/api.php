@@ -55,7 +55,7 @@ Route::group(['prefix' => 'v1'], function () {
         Route::patch('/', 'UserController@update');
         Route::delete('/followings/{user}', 'UserController@unfollow');
         Route::put('/{user}/disable', 'UserController@disable')->middleware(CanDisableUser::class);
-        Route::put('/{id}/restore', 'UserController@enable')->middleware(CanDisableUser::class);
+        Route::put('/{user}/restore', 'UserController@enable')->middleware(CanDisableUser::class);
         Route::patch('/{user}/permissions/{permission}/enable', 'UserController@enableUserPermission')->middleware(CanModUser::class);
         Route::patch('/{user}/permissions/{permission}/disable', 'UserController@disableUserPermission')->middleware(CanModUser::class);
     });
