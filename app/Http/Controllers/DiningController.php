@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Dining\CreateDiningRequest;
+use App\Models\Neo\Log;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
@@ -65,6 +66,8 @@ class DiningController extends Controller
     {
         $restaurant = $this->diningService->createRestaurant(Auth::id(), $request->name, $request->rest_id, $request->image_url, $request->phone, $request->city, $request->address);
 
+        Log::activity('dining.favourite', $restaurant->getId());
+
         return FavRestaurantResource::make($restaurant)->response()->setStatusCode(Response::HTTP_CREATED);
     }
 
@@ -80,6 +83,8 @@ class DiningController extends Controller
         $restaurant = $this->diningService->getDeleteUserRestaurant($userId, $rest_id);
 
         $this->diningService->detachDeleteRestaurant($userId, $rest_id);
+
+        Log::activity('dining.remove.favourite');
 
         return FavRestaurantResource::make($restaurant)->response();
     }
