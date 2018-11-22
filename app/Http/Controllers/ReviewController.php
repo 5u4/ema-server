@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Review\CreateReviewRequest;
 use App\Http\Resources\ReviewSource;
+use App\Models\Neo\Log;
 use App\Services\ReviewService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
@@ -49,6 +50,8 @@ class ReviewController extends Controller
     {
         $review = $this->reviewService->createReview(Auth::id(), $request->reviewTitle, $request->reviewContent, $request->movieId, $request->rate);
 
+        Log::activity('review.create');
+
         return ReviewSource::make($review)->response()->setStatusCode(Response::HTTP_CREATED);
     }
 
@@ -63,6 +66,8 @@ class ReviewController extends Controller
         $review = $this->reviewService->getMovieReview($reviewId);
 
         $this->reviewService->detachDeleteReview($reviewId);
+
+        Log::activity('review.removed');
 
         return ReviewSource::make($review)->response();
     }
