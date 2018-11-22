@@ -25,6 +25,7 @@ class ReviewSource extends JsonResource
             "username" => $userName,
             "userId" => $userId,
             "rate" => $this->getRate(),
+            'avatarUrl' => action('AvatarController@show', ['user' => $userId]),
         );
     }
 }
