@@ -46,7 +46,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  */
 class User extends Authenticatable
 {
-    use Notifiable, SoftDeletes;
+    use Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -54,7 +54,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'username', 'email', 'password', 'last_login', 'avatar_name', 'avatar_path',
+        'username', 'email', 'password', 'last_login', 'avatar_name', 'avatar_path', 'deleted_at',
     ];
 
     /**
@@ -66,14 +66,40 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
-
-
     /**
      * @return BelongsToMany
      */
     public function permissions(): BelongsToMany
     {
         return $this->belongsToMany(Permission::class, 'user_permissions', 'user_id', 'permission_id');
+    }
+
+    /**
+     * @return bool
+     */
+    public function isActive(): bool
+    {
+        return !$this->deleted_at;
+    }
+
+    /**
+     *
+     */
+    public function disable()
+    {
+        $this->update([
+            'deleted_at' => time(),
+        ]);
+    }
+
+    /**
+     *
+     */
+    public function enable()
+    {
+        $this->update([
+            'deleted_at' => null,
+        ]);
     }
 
     /**

@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Users\UpdateUserPermissionRequest;
 use App\Http\Requests\Users\UpdateUserRequest;
-use App\Http\Resources\PermissionResource;
 use App\Http\Resources\UserResource;
 use App\Mail\Invitation;
 use App\Models\Neo\Log;
@@ -14,7 +12,6 @@ use Illuminate\Http\JsonResponse;
 use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Mail;
 
@@ -53,7 +50,7 @@ class UserController extends Controller
      */
     public function index(): JsonResponse
     {
-        return UserResource::collection(User::withTrashed()->get())->response();
+        return UserResource::collection(User::all())->response();
     }
 
     /**
@@ -158,7 +155,7 @@ class UserController extends Controller
             throw new BadRequestHttpException("You are not allowed to disable yourself");
         }
 
-        $user->delete();
+        $user->disable();
 
         Log::activity('user.disable', $user->id, true);
 
@@ -166,19 +163,17 @@ class UserController extends Controller
     }
 
     /**
-     * @param int $id
+     * @param User $user
      *
      * @return JsonResponse
      */
-    public function enable(int $id): JsonResponse
+    public function enable(User $user): JsonResponse
     {
-        if (Auth::id() === $id) {
+        if (Auth::id() === $user->id) {
             throw new BadRequestHttpException("You are not allowed to enable yourself");
         }
 
-        $user = User::onlyTrashed()->findOrFail($id);
-
-        $user->restore();
+        $user->enable();
 
         Log::activity('user.enable', $user->id, true);
 
