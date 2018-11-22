@@ -74,7 +74,7 @@ class AuthController extends Controller
      */
     public function login(LoginRequest $request): JsonResponse
     {
-        if (User::where('email', $request->email)->exists() === false) {
+        if (User::where('email', $request->email)->first()->isActive() === false) {
             throw new AccessDeniedHttpException("Your account is banned. Please contact the admin to restore your account");
         }
 

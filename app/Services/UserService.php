@@ -98,8 +98,8 @@ class UserService
         $users = User::where('username', 'like', $searchString)
             ->orWhere('email', 'like', $searchString);
 
-        if ($withTrashed) {
-            $users = $users->withTrashed();
+        if ($withTrashed === false) {
+            $users = $users->whereNull('deleted_at');
         }
 
         return $users->get();
